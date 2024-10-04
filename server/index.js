@@ -7,6 +7,8 @@ const dotenv = require('dotenv');
 const productRoute = require('./routes/product'); 
 const brandRoute = require('./routes/brand');
 const userRoute = require('./routes/user');
+const roleRoute = require('./routes/role');
+
 const  connectDB  = require('./config/db');
 dotenv.config();
 
@@ -19,7 +21,7 @@ app.use(morgan("common"));
 app.use('/brands', brandRoute); // Route cho thương hiệu
 app.use('/users',userRoute);
 app.use('/products',productRoute);
-
+app.use('/role',roleRoute);
 app.listen(4000, () => {
     connectDB();
     console.log("Server is running... ");
