@@ -10,6 +10,6 @@ const userSchema = new mongoose.Schema({
   phonenumber: String,
   account_date: { type: Date, default: Date.now },
   is_active: { type: Number, default: 1 }
-});
+},{ versionKey: false });
 
 module.exports = mongoose.model('User', userSchema);

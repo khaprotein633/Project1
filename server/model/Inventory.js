@@ -7,6 +7,6 @@ const inventorySchema = new mongoose.Schema({
   price: { type: Number, required: true },
   quantity: { type: Number, required: true },
   last_updated: { type: Date, default: Date.now }
-});
+},{ versionKey: false });
 
 module.exports = mongoose.model('Inventory', inventorySchema);

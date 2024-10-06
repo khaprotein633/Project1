@@ -10,7 +10,7 @@ const productSchema = new mongoose.Schema({
   hide: { type: Number, default: 0 },
   date_added: { type: Date, default: Date.now },
   date_updated: { type: Date, default: Date.now }
-});
+},{ versionKey: false });
 
 const Products = mongoose.model('Products', productSchema);
 
