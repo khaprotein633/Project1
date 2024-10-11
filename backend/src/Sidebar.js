@@ -24,18 +24,24 @@ const Sidebar = () => {
                     </Link>
                 </li>
                 <li  className= {active===2 ? 'active nav-item p-2 m-1' : 'nav-item p-2  m-1'} onClick={()=>setActive(2)}>
+                    <Link className='p-1 text-white nav-link' to={'/brand'}>
+                        <i className='bi bi-star me-3 fs-5'></i>
+                        <span className='fs-4'> Brands</span>
+                    </Link>
+                </li>
+                <li  className= {active===3 ? 'active nav-item p-2 m-1' : 'nav-item p-2  m-1'} onClick={()=>setActive(3)}>
                     <Link className='p-1 text-white nav-link' to={'/user'}>
                         <i className='bi bi-people me-3 fs-5'></i>
                         <span className='fs-4'> Users</span>
                     </Link>
                 </li>
-                <li  className= {active===3 ? 'active nav-item p-2 m-1' : 'nav-item p-2  m-1'} onClick={()=>setActive(3)}>
+                <li  className= {active===4 ? 'active nav-item p-2 m-1' : 'nav-item p-2  m-1'} onClick={()=>setActive(4)}>
                     <Link className='p-1 text-white nav-link' to={'/order'}>
                         <i className='bi bi-table me-3 fs-5'></i>
                         <span className='fs-4'> Orders</span>
                     </Link>
                 </li>
-                <li  className= {active===4 ? 'active nav-item p-2 m-1' : 'nav-item p-2  m-1'} onClick={()=>setActive(4)}>
+                <li  className= {active===5 ? 'active nav-item p-2 m-1' : 'nav-item p-2  m-1'} onClick={()=>setActive(5)}>
                     <Link className='p-1 text-white nav-link' to={'/report'}>
                         <i className='bi bi-grid me-3 fs-5'></i>
                         <span className='fs-4'> Report</span>

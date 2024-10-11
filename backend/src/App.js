@@ -36,6 +36,7 @@ function App() {
           <Outlet /> {/* Đây là nơi các trang con sẽ được hiển thị */}
         
       </div>
+      
     </div>
   )
 }
