@@ -3,8 +3,6 @@ import { Navigate } from 'react-router-dom';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Lightbox from 'react-image-lightbox'
-import 'react-image-lightbox/style.css'
 
 
 const Brand = () => {
@@ -12,18 +10,14 @@ const Brand = () => {
     const [createbrand, setcreatebrand] = useState(false);
     const [edit, setedit] = useState(false);
     const [idedit, setidedit] = useState(null);
-    const [newBrandName, setNewBrandName] = useState(''); // State cho tên thương hiệu mới
-    const [newBrandLogo, setNewBrandLogo] = useState(null); // State cho file logo mới
-    const [searchbrand,setsearchbrand] = useState('');
+    const [newBrandName, setNewBrandName] = useState('');
+    const [newBrandLogo, setNewBrandLogo] = useState(null);
+    const [searchbrand, setsearchbrand] = useState('');
 
-    const[isOpen,setIsOpen] = useState(false);
-    const[selectedImage, setSelectedImage] = useState('');
 
     useEffect(() => {
-        if(!searchbrand.trim()){
-            fetchBrands();
-        }
-    }, [searchbrand]);
+        fetchBrands();
+    }, []);
 
     const fetchBrands = async () => {
         try {
@@ -38,24 +32,19 @@ const Brand = () => {
         return <Navigate to={'/createbrand'} />;
     }
 
-    const handleImageClick = (imageUrl) => {
-        setSelectedImage(imageUrl); // Lưu đường dẫn ảnh vào state
-        setIsOpen(true); // Mở lightbox
-    };
-
-    const handleSearch = async (e)=>{
+    const handleSearch = async (e) => {
         e.preventDefault();
-        if(!searchbrand.trim()){
+        if (!searchbrand.trim()) {
             fetchBrands();
+            return;
         }
-        try{
+        try {
             const res = await axios.get(`http://localhost:4000/api/brand/getbrandbyname/${searchbrand}`);
             setlistbrand(res.data);
-        }
-        catch(err){
+        } catch (err) {
             console.log(err);
         }
-    }
+    };
 
     const handleEdit = (item) => {
         setedit(true);
@@ -69,7 +58,7 @@ const Brand = () => {
         formData.append('brand_id', item.brand_id);
         formData.append('brand_name', newBrandName);
         if (newBrandLogo instanceof File) {
-            formData.append('brand_logo_url', newBrandLogo); // Thêm file logo vào form
+            formData.append('brand_logo_url', newBrandLogo);
         }
         try {
             const res = await axios.put(`http://localhost:4000/api/brand/updatebrand/${item.brand_id}`, formData, {
@@ -78,8 +67,8 @@ const Brand = () => {
                 },
             });
             console.log('Brand updated successfully:', res.data);
-            fetchBrands(); // Cập nhật danh sách thương hiệu
-            setedit(false); // Đóng chế độ chỉnh sửa
+            fetchBrands();
+            setedit(false);
         } catch (err) {
             console.error('Error while updating brand:', err);
         }
@@ -88,17 +77,17 @@ const Brand = () => {
     const handleDelete = async (item) => {
         const confirmDelete = window.confirm(`Bạn có chắc chắn muốn xóa thương hiệu ${item.brand_name}?`);
         if (!confirmDelete) {
-            return; // Nếu người dùng không xác nhận, thoát khỏi hàm
+            return;
         }
-    
+
         try {
             const res = await axios.delete(`http://localhost:4000/api/brand/deletebrand/${item.brand_id}`);
             console.log('Brand deleted successfully:', res.data);
-            toast.success('Xóa thương hiệu thành công!'); // Hiển thị thông báo thành công
-            fetchBrands(); // Cập nhật danh sách thương hiệu
+            toast.success('Xóa thương hiệu thành công!');
+            fetchBrands();
         } catch (err) {
             console.error('Error while deleting brand:', err);
-            toast.error('Có lỗi xảy ra khi xóa thương hiệu!'); // Hiển thị thông báo lỗi
+            toast.error('Có lỗi xảy ra khi xóa thương hiệu!');
         }
     };
 
@@ -113,7 +102,7 @@ const Brand = () => {
                         placeholder="Search"
                         aria-label="Search"
                         value={searchbrand}
-                        onChange={(e)=>setsearchbrand(e.target.value)}
+                        onChange={(e) => setsearchbrand(e.target.value)}
                     />
                     <button className="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
                 </form>
@@ -131,20 +120,20 @@ const Brand = () => {
                 <tbody>
                     {listbrand.map((item) => (
                         <tr key={item.brand_id}>
-                            {edit === true && idedit === item.brand_id ?
+                            {edit === true && idedit === item.brand_id ? (
                                 <>
                                     <td>{item.brand_id}</td>
                                     <td>
                                         <input
                                             type="file"
-                                            onChange={(e) => setNewBrandLogo(e.target.files[0])} // Lưu file vào state
+                                            onChange={(e) => setNewBrandLogo(e.target.files[0])}
                                         />
                                     </td>
                                     <td>
                                         <input
                                             type="text"
                                             value={newBrandName}
-                                            onChange={(e) => setNewBrandName(e.target.value)} // Lưu tên thương hiệu mới vào state
+                                            onChange={(e) => setNewBrandName(e.target.value)}
                                             placeholder="Brand name"
                                         />
                                     </td>
@@ -154,15 +143,15 @@ const Brand = () => {
                                         </button>
                                     </td>
                                 </>
-                                :
+                            ) : (
                                 <>
                                     <td>{item.brand_id}</td>
                                     <td>
                                         <img
                                             src={item.brand_logo_url}
                                             alt={item.brand_name}
-                                            style={{ width: '50px', height: '50px' }}
-                                            onClick={()=>handleImageClick(item.brand_logo_url)}
+                                            style={{ width: '50px', height: '50px', cursor: 'pointer' }}
+                                            onClick={() => handleImageClick(item.brand_logo_url)}
                                         />
                                     </td>
                                     <td>{item.brand_name}</td>
@@ -170,33 +159,21 @@ const Brand = () => {
                                         <button className="btn btn-warning me-2" onClick={() => handleEdit(item)}>
                                             Edit
                                         </button>
-                                        <button className="btn btn-danger" onClick={()=>handleDelete(item)}>
+                                        <button className="btn btn-danger" onClick={() => handleDelete(item)}>
                                             Delete
                                         </button>
                                     </td>
                                 </>
-                            }
+                            )}
                         </tr>
                     ))}
                 </tbody>
             </table>
-
-                    {isOpen === true && <>
-                        <Lightbox mainSrc={selectedImage}
-                                    onCloseRequest={()=>setIsOpen(false)}
-                        />
-                    </>
-                       
-                    
-
-                    }
-
             <div className="d-flex justify-content-center mt-3">
                 <button className="btn btn-primary" onClick={() => setcreatebrand(true)}>
                     Add Brand
                 </button>
             </div>
-
 
             <ToastContainer
                 position="top-center"
@@ -210,6 +187,8 @@ const Brand = () => {
                 pauseOnHover
                 theme="light"
             />
+
+           
         </div>
     );
 };
