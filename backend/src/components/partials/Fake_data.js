@@ -2,7 +2,7 @@ export const linerChartData = {
     labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday' , 'Sunday'],
     datasets: [
       {
-        label: 'aaa',
+        label: 'aaaaaa',
         data: [2, 2, 2, 3, 1, 6, 0,0],
         borderColor: 'rgb(75, 192, 192)',
       
