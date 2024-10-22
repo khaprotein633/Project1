@@ -4,7 +4,7 @@ const roleController = {
     getAllRoles: async (req, res) => {
         try{
             const listRole = await Role.find({});
-            res.status(200).json(listRole);
+            res.status(200).json({listRole});
         }catch(err){
             console.error('Error:', error);
             res.status(500).json({ message: 'Internal Server Error' });

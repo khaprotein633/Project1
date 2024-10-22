@@ -1,36 +1,50 @@
 import React, { useEffect, useState } from 'react';
-import { Navigate } from 'react-router-dom';
+
 import axios from 'axios';
+
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+import { Image, Pagination, Modal } from 'antd';
+import CreateBrand from './CreateBrand';
 
 const Brand = () => {
     const [listbrand, setlistbrand] = useState([]);
+
     const [createbrand, setcreatebrand] = useState(false);
+
     const [edit, setedit] = useState(false);
     const [idedit, setidedit] = useState(null);
+
     const [newBrandName, setNewBrandName] = useState('');
+
     const [newBrandLogo, setNewBrandLogo] = useState(null);
     const [searchbrand, setsearchbrand] = useState('');
 
+    const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
+    const [pageSize] = useState(5); // Số mục trên mỗi trang
+    const [total, setTotal] = useState(0); // Tổng số mục
 
     useEffect(() => {
         fetchBrands();
-    }, []);
+    }, [currentPage]);
 
-    const fetchBrands = async () => {
+    const fetchBrands = async (page = currentPage) => {
         try {
-            const res = await axios.get('http://localhost:4000/api/brand/getAllBrands');
-            setlistbrand(res.data);
+            const res = await axios.get(`http://localhost:4000/api/brand/getAllBrands?page=${page}&size=${pageSize}`, {
+                headers: {
+                    'Cache-Control': 'no-cache', // Tắt caching
+                    'Pragma': 'no-cache',
+                    'Expires': '0',
+                },
+            });
+            setlistbrand(res.data.brands);
+            setTotal(res.data.total);
         } catch (err) {
             console.log(err);
         }
     };
-
-    if (createbrand) {
-        return <Navigate to={'/createbrand'} />;
-    }
+    
 
     const handleSearch = async (e) => {
         e.preventDefault();
@@ -48,20 +62,20 @@ const Brand = () => {
 
     const handleEdit = (item) => {
         setedit(true);
-        setidedit(item.brand_id);
+        setidedit(item._id);
         setNewBrandLogo(item.brand_logo_url);
         setNewBrandName(item.brand_name);
     };
 
     const handleSave = async (item) => {
         const formData = new FormData();
-        formData.append('brand_id', item.brand_id);
+        formData.append('_id', item._id);
         formData.append('brand_name', newBrandName);
         if (newBrandLogo instanceof File) {
-            formData.append('brand_logo_url', newBrandLogo);
+            formData.append('brand_logo', newBrandLogo);
         }
         try {
-            const res = await axios.put(`http://localhost:4000/api/brand/updatebrand/${item.brand_id}`, formData, {
+            const res = await axios.put(`http://localhost:4000/api/brand/updatebrand/${item._id}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -81,7 +95,7 @@ const Brand = () => {
         }
 
         try {
-            const res = await axios.delete(`http://localhost:4000/api/brand/deletebrand/${item.brand_id}`);
+            const res = await axios.delete(`http://localhost:4000/api/brand/deletebrand/${item._id}`);
             console.log('Brand deleted successfully:', res.data);
             toast.success('Xóa thương hiệu thành công!');
             fetchBrands();
@@ -90,6 +104,8 @@ const Brand = () => {
             toast.error('Có lỗi xảy ra khi xóa thương hiệu!');
         }
     };
+
+
 
     return (
         <div className="container mt-4">
@@ -111,7 +127,6 @@ const Brand = () => {
             <table className="table table-striped table-bordered">
                 <thead className="table-light">
                     <tr>
-                        <th>ID</th>
                         <th>LOGO</th>
                         <th>Name</th>
                         <th>Actions</th>
@@ -119,10 +134,9 @@ const Brand = () => {
                 </thead>
                 <tbody>
                     {listbrand.map((item) => (
-                        <tr key={item.brand_id}>
-                            {edit === true && idedit === item.brand_id ? (
+                        <tr key={item._id}>
+                            {edit === true && idedit === item._id ? (
                                 <>
-                                    <td>{item.brand_id}</td>
                                     <td>
                                         <input
                                             type="file"
@@ -145,13 +159,10 @@ const Brand = () => {
                                 </>
                             ) : (
                                 <>
-                                    <td>{item.brand_id}</td>
                                     <td>
-                                        <img
-                                            src={item.brand_logo_url}
-                                            alt={item.brand_name}
+                                        <Image
                                             style={{ width: '50px', height: '50px', cursor: 'pointer' }}
-                                            onClick={() => handleImageClick(item.brand_logo_url)}
+                                            src={item.brand_logo_url}
                                         />
                                     </td>
                                     <td>{item.brand_name}</td>
@@ -169,11 +180,37 @@ const Brand = () => {
                     ))}
                 </tbody>
             </table>
+
+            <Pagination
+                align="end"
+                current={currentPage}
+                pageSize={pageSize}
+                total={total}
+                onChange={(page) => {
+                    setCurrentPage(page);
+                    fetchBrands(page); // Gọi lại hàm fetch với trang mới
+                }}
+            />
+
             <div className="d-flex justify-content-center mt-3">
                 <button className="btn btn-primary" onClick={() => setcreatebrand(true)}>
                     Add Brand
                 </button>
             </div>
+            <Modal
+        title="ADD BRAND"
+        centered
+        open={createbrand}
+        onCancel={() => setcreatebrand(false)}
+        footer={null}
+      >
+        <CreateBrand onSuccess={()=>{
+            setcreatebrand(false);
+            fetchBrands();
+            }}/>
+      </Modal>
+
+
 
             <ToastContainer
                 position="top-center"
@@ -187,8 +224,6 @@ const Brand = () => {
                 pauseOnHover
                 theme="light"
             />
-
-           
         </div>
     );
 };

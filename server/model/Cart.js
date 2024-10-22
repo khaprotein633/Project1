@@ -2,13 +2,7 @@ const mongoose = require('mongoose');
 
 // Định nghĩa schema cho ShoppingCart
 const shoppingCartSchema = new mongoose.Schema({
-  
-  cart_id: { 
-    type: String, 
-    required: true, 
-    unique: true 
-  },
-
+ 
   user_id: { 
     type: String, 
     ref: 'User', 

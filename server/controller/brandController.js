@@ -4,16 +4,26 @@ const brandController = {
     // Retrieve all brands
     getAllBrands: async (req, res) => {
         try {
-            const listBrand = await Brands.find({});
-            res.status(200).json(listBrand);
+            const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là 1
+            const size = parseInt(req.query.size) || 5; // Số mục trên mỗi trang, mặc định là 5
+            const skip = (page - 1) * size; // Số mục cần bỏ qua
+    
+            const listBrand = await Brands.find({})
+                .skip(skip)
+                .limit(size); // Giới hạn số kết quả trả về
+    
+            const total = await Brands.countDocuments(); // Tổng số mục
+    
+            res.status(200).json({ brands: listBrand, total });
         } catch (error) {
             res.status(500).json({ message: 'Error fetching brands', error: error.message });
         }
-    },
+    }
+    ,
      // Get brand by brand_id
      getBrandById: async (req, res) => {
         try {
-            const brand = await Brands.findOne({ brand_id: req.params.brand_id });
+            const brand = await Brands.findOne({ _id: req.params._id });
             if (!brand) {
                 return res.status(404).json({ message: 'Brand not found' });
             }
@@ -44,8 +54,6 @@ const brandController = {
             const {brand_name} = req.body;
              // Đường dẫn đầy đủ bao gồm tiền tố 'http://localhost:4000/'
             const logoUrl = req.file ? `http://localhost:4000/${req.file.path.replace(/\\/g, '/')}` : '';
-             const maxbrand_id = await Brands.findOne().sort({brand_id:-1}).limit(1);
-            const newbrand_id = maxbrand_id ? maxbrand_id.brand_id +1 : 1;
 
             // Check if brand already exists
             const existingBrand = await Brands.findOne({brand_name});
@@ -53,7 +61,7 @@ const brandController = {
                 return res.status(400).json({ message: 'Brand already exists' });
             }
 
-            const newBrand = new Brands({ brand_id:newbrand_id, brand_name, brand_logo_url:logoUrl });
+            const newBrand = new Brands({brand_name, brand_logo_url:logoUrl });
             await newBrand.save();
 
             res.status(200).json(newBrand);
@@ -65,9 +73,9 @@ const brandController = {
    
 
    // Update brand by brand_id
-updateBrand: async (req, res) => {
+    updateBrand: async (req, res) => {
     try {
-        const { brand_id } = req.params;
+        const { _id } = req.params;
         const { brand_name } = req.body; // Lấy brand_name từ req.body
         const brand_logo_url = req.file ? `http://localhost:4000/${req.file.path.replace(/\\/g, '/')}` : null; // Đường dẫn đầy đủ cho logo
 
@@ -82,7 +90,7 @@ updateBrand: async (req, res) => {
         }
 
         const updatedBrand = await Brands.findOneAndUpdate(
-            { brand_id },
+            {_id },
             updateData,
             { new: true } // This option returns the updated document
         );
@@ -101,8 +109,8 @@ updateBrand: async (req, res) => {
     // Delete brand by brand_id
     deleteBrand: async (req, res) => {
         try {
-            const { brand_id } = req.params;
-            const deletedBrand = await Brands.findOneAndDelete({ brand_id });
+            const {_id } = req.params;
+            const deletedBrand = await Brands.findOneAndDelete({ _id });
 
             if (!deletedBrand) {
                 return res.status(404).json({ message: 'Brand not found' });

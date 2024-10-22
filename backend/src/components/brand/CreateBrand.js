@@ -1,100 +1,114 @@
 import axios from 'axios';
 import React, { useState } from 'react';
-import { Navigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-const CreateBrand = () => {
-  const [brandName, setBrandName] = useState('');
-  const [brandLogo, setBrandLogo] = useState(null); 
-  const [redirect, setRedirect] = useState(false);
-  
-  const [searchbrand,setsearchbrand] = useState('');
+import { Button, Form, Input, Upload } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+const CreateBrand = ({ onSuccess }) => {
+  const [form] = Form.useForm(); // Sử dụng hook form của Ant Design
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (values) => {
+    setLoading(true);
 
     // Tạo FormData để chứa dữ liệu
     const formData = new FormData();
-    formData.append('brand_name', brandName);
-    formData.append('brand_logo_url', brandLogo); // Thêm file logo vào form
+    formData.append('brand_name', values.brand_name); // Lấy giá trị từ Ant Design Form
+    if (values.brand_logo && values.brand_logo[0]?.originFileObj) {
+      formData.append('brand_logo', values.brand_logo[0].originFileObj); // Lấy file upload từ Ant Design Form
+    }
 
     try {
       const res = await axios.post('http://localhost:4000/api/brand/addBrand', formData, {
         headers: {
-          'Content-Type': 'multipart/form-data', // Đặt header đúng định dạng
+          'Content-Type': 'multipart/form-data',
         },
       });
-      console.log('Form submitted successfully:', res.data);
+      form.resetFields(); // Reset form sau khi thêm thành công
+      if (onSuccess) {
+        onSuccess();
+      }
       toast.success('Thêm thương hiệu thành công!');
-      setTimeout(() => {
-        setRedirect(true);
-      }, 5000);
     } catch (err) {
       console.error('Error while submitting form:', err);
-      toast.error('Có lỗi xảy ra!'); // Hiển thị thông báo lỗi
+      toast.error('Có lỗi xảy ra!');
+    } finally {
+      setLoading(false);
     }
-   
   };
 
-  if(redirect){
-    return <Navigate to={'/brand'}/>
-  }
   return (
     <div className="container mt-4">
-      <form className="form-horizontal" onSubmit={handleSubmit}>
-        <legend>BRANDS</legend>
+      <Form
+        form={form}
+        name="create-brand"
+        labelCol={{
+          span: 8,
+        }}
+        wrapperCol={{
+          span: 16,
+        }}
+        style={{
+          maxWidth: 600,
+        }}
+        onFinish={handleSubmit}
+        autoComplete="off"
+      >
+        <Form.Item
+          label="Tên thương hiệu"
+          name="brand_name"
+          rules={[
+            {
+              required: true,
+              message: 'Vui lòng nhập tên thương hiệu!',
+            },
+          ]}
+        >
+          <Input />
+        </Form.Item>
 
-        <div className="form-group">
-          <label className="col-md-4 control-label" htmlFor="product_name">
-            BRAND NAME
-          </label>
-          <div className="col-md-4">
-            <input
-              id="brandname"
-              placeholder="Enter Brand name"
-              className="form-control input-md"
-              required
-              type="text"
-              onChange={(e) => setBrandName(e.target.value)} // Lưu tên thương hiệu vào state
-            />
-          </div>
-        </div>
+        <Form.Item
+          label="Logo thương hiệu"
+          name="brand_logo"
+          valuePropName="fileList"
+          getValueFromEvent={(e) => Array.isArray(e) ? e : e && e.fileList}
+          rules={[
+            {
+              required: true,
+              message: 'Vui lòng tải lên logo thương hiệu!',
+            },
+          ]}
+        >
+          <Upload beforeUpload={() => false} maxCount={1}>
+            <Button icon={<UploadOutlined />}>Tải lên logo</Button>
+          </Upload>
+        </Form.Item>
 
-        <div className="form-group">
-          <label className="col-md-4 control-label" htmlFor="file_main_image">
-            BRAND LOGO
-          </label>
-          <div className="col-md-4">
-            <input
-              id="file_main_image"
-              name="file_main_image"
-              className="input-file"
-              type="file"
-              onChange={(e) => setBrandLogo(e.target.files[0])} // Lưu file vào state
-            />
-          </div>
-        </div>
+        <Form.Item
+          wrapperCol={{
+            offset: 8,
+            span: 16,
+          }}
+        >
+          <Button type="primary" htmlType="submit" loading={loading}>
+            Thêm thương hiệu
+          </Button>
+        </Form.Item>
+      </Form>
 
-        <div className="form-group">
-          <div className="col-md-4 col-md-offset-4">
-            <button id="singlebutton" name="singlebutton" className="btn btn-primary" type="submit">
-              Submit
-            </button>
-          </div>
-        </div>
-      </form>
       <ToastContainer
-                position="top-center"
-                autoClose={5000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-                theme="light"
-            />
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </div>
   );
 };

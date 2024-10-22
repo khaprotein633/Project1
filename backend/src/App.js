@@ -33,9 +33,9 @@ function App() {
       </div>
       <div className='col overflow-auto'>
         <Navbar Toggle={Toggle}/>
-          <Outlet /> {/* Đây là nơi các trang con sẽ được hiển thị */}
+          <Outlet /> 
         
-      </div>
+       </div>
       
     </div>
   )

@@ -3,12 +3,7 @@ const mongoose = require('mongoose');
 // Định nghĩa schema cho ProductReview
 const commentSchema = new mongoose.Schema({
   
-  product_review_id: { 
-    type: String, 
-    required: true, 
-    unique: true 
-  },
-  
+ 
   product_id: { 
     type: String, 
     ref: 'Product', 

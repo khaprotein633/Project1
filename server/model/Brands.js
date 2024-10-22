@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 
 const brandSchema = new mongoose.Schema({
-    brand_id: { type: Number},
    
     brand_name: { type: String},
     
