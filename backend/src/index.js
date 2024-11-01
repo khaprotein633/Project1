@@ -16,6 +16,7 @@ import Home from './components/home/Home';
 import Brand from './components/brand/Brand';
 import CreateBrand from './components/brand/CreateBrand';
 import User from './components/user/User';
+import Product from './components/product/Product';
 
 const router = createBrowserRouter([
   {
@@ -42,6 +43,10 @@ const router = createBrowserRouter([
       {
         path: "order",
         element: <Orders />
+      },
+      {
+        path: "product",
+        element: <Product/>
       },
       {
         path: "report",

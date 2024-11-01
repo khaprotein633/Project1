@@ -1,9 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+
 import { Table, Pagination, Popconfirm, Tooltip , Modal, Button} from 'antd';
 import { EyeOutlined, DeleteOutlined ,UserAddOutlined} from '@ant-design/icons'; 
+
 import UserInfo from './UserInfo';
 import CreateUser from './CreateUser';
+
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 const User = () => {
     const [listUser, setlistUser] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -13,6 +19,7 @@ const User = () => {
     const [userid,setuserid] = useState('');
     const [userinfo , setuserinfo] = useState(false);
 
+    
     const [creatuser,setcreateuser] = useState(false);
 
     useEffect(() => {
@@ -21,7 +28,7 @@ const User = () => {
 
     const fetchUsers = async (page = currentPage) => {
         try {
-            const res = await axios.get(`http://localhost:4000/api/user/getAllUser?page=${page}&size=${pageSize}`, {
+            const res = await axios.get(`http://localhost:4000/api/user/get?page=${page}&size=${pageSize}`, {
                 headers: {
                     'Cache-Control': 'no-cache', 
                     'Pragma': 'no-cache',
@@ -37,22 +44,17 @@ const User = () => {
 
     
 
-    const handleDelete = async (user_id) => {
+    const handleDelete = async (_id) => {
         try {
-            await axios.delete(`http://localhost:4000/api/user/deleteUser/${user_id}`);
-            setlistUser(listUser.filter(user => user.user_id !== user_id)); // Loại bỏ user đã bị xóa khỏi danh sách
-            console.log("Xóa user thành công:", user_id);
+            await axios.delete(`http://localhost:4000/api/user/delete/${_id}`);
+            fetchUsers(currentPage);
+            console.log("Xóa user thành công!");
         } catch (error) {
             console.error("Lỗi khi xóa user:", error);
         }
     };
 
     const columns = [
-        {
-            title: 'User ID',
-            dataIndex: 'user_id',
-            key: 'user_id',
-        },
         {
             title: 'Name',
             dataIndex: 'name',
@@ -78,14 +80,14 @@ const User = () => {
                             style={{ color: '#1890ff', cursor: 'pointer' }} 
                             onClick={() => 
                             {setuserinfo(true)
-                              setuserid(record.user_id)
+                              setuserid(record._id)
                             }} 
                         />
                     </Tooltip>
                     <Tooltip title="Xóa">
                         <Popconfirm
                             title="Bạn có chắc chắn muốn xóa người dùng này?"
-                            onConfirm={() => handleDelete(record.user_id)}
+                            onConfirm={() => handleDelete(record._id)}
                             okText="Xóa"
                             cancelText="Hủy"
                         >
@@ -105,7 +107,7 @@ const User = () => {
             <Table
                 dataSource={listUser}
                 columns={columns}
-                rowKey="user_id" 
+                rowKey="_id" 
                 pagination={false} 
             />
             <Pagination
@@ -141,8 +143,23 @@ const User = () => {
         onCancel={() => setcreateuser(false)}
         footer={null}
       >
-       <CreateUser/>
+       <CreateUser onSuccess={()=>{
+            setcreateuser(false);
+            fetchUsers();
+            }}/>
       </Modal>
+      <ToastContainer
+                position="top-center"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+            />
         </div>
     );
 };

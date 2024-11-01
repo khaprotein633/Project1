@@ -5,7 +5,6 @@ const UserInfo = ({ userid }) => {
     const [user, setUser] = useState(null); // Khởi tạo user là null
 
     useEffect(() => {
-        console.log("Current user ID:", userid);
         if (userid) {
             fetchUser(); // Gọi hàm fetchUser khi có userid
         }
@@ -14,7 +13,6 @@ const UserInfo = ({ userid }) => {
     const fetchUser = async () => {
         try {
             const res = await axios.get(`http://localhost:4000/api/user/get/${userid}`);
-            console.log("Fetched user data:", res.data.user);
             setUser(res.data.user);
         } catch (err) {
             console.log(err);
@@ -26,7 +24,7 @@ const UserInfo = ({ userid }) => {
             {user ? ( // Kiểm tra nếu user tồn tại mới hiển thị dữ liệu
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     <div>
-                        <strong>User ID:</strong> {user.user_id}
+                        <strong>User ID:</strong> {user._id}
                     </div>
                     <div>
                         <strong>Tên:</strong> {user.name}

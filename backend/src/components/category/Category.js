@@ -21,10 +21,6 @@ const Category = () => {
         console.log(err);
     }
 };
-
-
-
-
   return (
     <div>
       

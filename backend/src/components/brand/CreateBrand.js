@@ -20,7 +20,7 @@ const CreateBrand = ({ onSuccess }) => {
     }
 
     try {
-      const res = await axios.post('http://localhost:4000/api/brand/addBrand', formData, {
+      const res = await axios.post('http://localhost:4000/api/brand/add', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

@@ -7,21 +7,21 @@ const router = express.Router();
 router.get('/get', productController.getAllProducts);
 
 // Get a product by product_id
-router.get('/get/:product_id', productController.getProductById);
+router.get('/get/:_id', productController.getProductById);
 
 // Get products by brand_id
 router.get('/brand/:brand_id', productController.getProductsByBrandId);
 
 // Get products by category_id
-router.get('/category/:category_id', productController.getProductsByCategoryId);
+router.get('/get/:category_id', productController.getProductsByCategoryId);
 
 // Add a new product
-router.post('/addproduct', productController.addProduct);
+router.post('/add', productController.addProduct);
 
 // Update a product by product_id
-router.put('/update/:product_id', productController.updateProduct);
+router.put('/update/:_id', productController.updateProduct);
 
 // Delete a product by product_id
-router.delete('/delete/:product_id', productController.deleteProduct);
+router.delete('/delete/:_id', productController.deleteProduct);
 
 module.exports = router;

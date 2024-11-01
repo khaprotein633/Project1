@@ -4,18 +4,24 @@ const productController = {
     // Get all products
     getAllProducts: async (req, res) => {
         try {
-            const products = await Product.find(); 
-            res.status(200).json(products);
+            const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là 1
+            const size = parseInt(req.query.size) || 5; // Số mục trên mỗi trang, mặc định là 5
+            const skip = (page - 1) * size; // Số mục cần bỏ qua
+
+            const products = await Product.find({}).skip(skip).limit(size); 
+            const total = await Product.countDocuments();
+
+
+            res.status(200).json({products,total});
         } catch (error) {
-            console.error('Error fetching products:', error);
-            res.status(500).json({ message: 'Internal Server Error' });
+            res.status(500).json({ message: 'Error fetching brands', error: error.message });
         }
     },
 
     // Get a product by product_id
     getProductById: async (req, res) => {
         try {
-            const product = await Product.findOne({ product_id: req.params.product_id }); 
+            const product = await Product.findOne({_id: req.params.product_id }); 
             if (!product) {
                 return res.status(404).json({ message: 'Product not found' });
             }

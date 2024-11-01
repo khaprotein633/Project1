@@ -33,17 +33,20 @@ const userController = {
         }
     },
 
-    // Add a new user
     addUser: async (req, res) => {
         try {
+            const existingUser = await User.findOne({ email: req.body.email });
+            if (existingUser) {
+                return res.status(400).json({ message: 'Email đã tồn tại' });
+            }
+    
             const newUser = new User({
-                ...req.body,
-                account_date: Date.now()
+                ...req.body
             }); 
-            await newUser.save(); // Lưu người dùng vào cơ sở dữ liệu
-            res.status(201).json(newUser); // Trả về người dùng mới được tạo
+            await newUser.save();
+            res.status(201).json(newUser); // Trả về người dùng mới được tạo, bao gồm _id
         } catch (error) {
-            console.error('Error adding user:', error);
+            console.error('Error adding user:', error);a
             res.status(500).json({ message: 'Internal Server Error' });
         }
     },
@@ -69,11 +72,12 @@ const userController = {
     // Delete a user by user_id
     deleteUser: async (req, res) => {
         try {
-            const user = await User.findOneAndDelete({ _id: req.params._id }); // Tìm và xóa người dùng
+            const {_id } = req.params;
+            const user = await User.findOneAndDelete({ _id}); // Tìm và xóa người dùng
             if (!user) {
                 return res.status(404).json({ message: 'User not found' });
             }
-            res.status(204).send(); // No content
+            res.status(200).json({ message: 'User deleted successfully' });
         } catch (error) {
             console.error('Error deleting user:', error);
             res.status(500).json({ message: 'Internal Server Error' });

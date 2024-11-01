@@ -31,7 +31,7 @@ const Brand = () => {
 
     const fetchBrands = async (page = currentPage) => {
         try {
-            const res = await axios.get(`http://localhost:4000/api/brand/getAllBrands?page=${page}&size=${pageSize}`, {
+            const res = await axios.get(`http://localhost:4000/api/brand/get?page=${page}&size=${pageSize}`, {
                 headers: {
                     'Cache-Control': 'no-cache', // Tắt caching
                     'Pragma': 'no-cache',
@@ -53,7 +53,7 @@ const Brand = () => {
             return;
         }
         try {
-            const res = await axios.get(`http://localhost:4000/api/brand/getbrandbyname/${searchbrand}`);
+            const res = await axios.get(`http://localhost:4000/api/brand/get/${searchbrand}`);
             setlistbrand(res.data);
         } catch (err) {
             console.log(err);
@@ -75,7 +75,7 @@ const Brand = () => {
             formData.append('brand_logo', newBrandLogo);
         }
         try {
-            const res = await axios.put(`http://localhost:4000/api/brand/updatebrand/${item._id}`, formData, {
+            const res = await axios.put(`http://localhost:4000/api/brand/update/${item._id}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -95,7 +95,7 @@ const Brand = () => {
         }
 
         try {
-            const res = await axios.delete(`http://localhost:4000/api/brand/deletebrand/${item._id}`);
+            const res = await axios.delete(`http://localhost:4000/api/brand/delete/${item._id}`);
             console.log('Brand deleted successfully:', res.data);
             toast.success('Xóa thương hiệu thành công!');
             fetchBrands();
