@@ -1,13 +1,47 @@
+import logo from "./logo.svg";
+import "./App.css";
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 
-import './App.css';
-import FE_layout from './views/FE_layout';
+
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer, toast } from "react-toastify";
+import { useEffect, useState } from "react";
+import Home from "./Pages/Home.jsx";
+import { loadUser } from "./Redux/actions/user.js";
+import Store from "./Redux/store.js";
+import Authentication from "./Pages/Authentication.jsx";
+import { getAllProducts } from "./Redux/actions/product.js";
 
 
 function App() {
+
+  useEffect(() => {
+    // Store.dispatch(loadUser());
+    Store.dispatch(getAllProducts());
+
+  }, []);
   return (
-    <>
-      <FE_layout/>
-    </>
+    <BrowserRouter>
+
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Authentication />} />
+
+      </Routes>
+
+      <ToastContainer
+        position="bottom-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
+    </BrowserRouter>
   );
 }
 

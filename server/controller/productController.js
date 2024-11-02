@@ -1,65 +1,100 @@
-const { model } = require('mongoose');
 const Product = require('../model/Product');
-const { response } = require('express');
 
 const productController = {
-    // Thêm sản phẩm 
-    addProduct: async (req, res) => {
+    // Get all products
+    getAllProducts: async (req, res) => {
         try {
-            const newProduct = new Product(req.body);
-            await newProduct.save(); // Lưu sản phẩm mới vào cơ sở dữ liệu
-            res.status(201).json(newProduct); // Trả về sản phẩm vừa thêm
-        } catch (error) {
-            res.status(500).json({ message: 'Failed to add product', error: error.message });
-        }
-    },
-
-    // Lấy danh sách sản phẩm
-    getProducts: async (req, res) => {
-        try {
-            const products = await Product.find(); // Lấy tất cả sản phẩm
+            const products = await Product.find(); 
             res.status(200).json(products);
         } catch (error) {
-            res.status(500).json({ message: 'Failed to retrieve products', error: error.message });
+            console.error('Error fetching products:', error);
+            res.status(500).json({ message: 'Internal Server Error' });
         }
     },
 
-    // Lấy sản phẩm theo ID
+    // Get a product by product_id
     getProductById: async (req, res) => {
         try {
-            const product = await Product.findOne({product_id: req.params.id}); // Tìm sản phẩm theo ID
+            const product = await Product.findOne({ product_id: req.params.product_id }); 
             if (!product) {
-                return res.status(404).json({ message: 'Product not found' }); // Trả về thông báo nếu không tìm thấy sản phẩm
+                return res.status(404).json({ message: 'Product not found' });
             }
-            res.status(200).json(product); // Trả về sản phẩm
+            res.status(200).json(product);
         } catch (error) {
-            res.status(500).json({ message: 'Failed to retrieve product', error: error.message });
+            console.error('Error fetching product:', error);
+            res.status(500).json({ message: 'Internal Server Error' });
         }
     },
 
-    // Cập nhật sản phẩm
+    // Get products by brand_id
+    getProductsByBrandId: async (req, res) => {
+        try {
+            const products = await Product.find({ brand_id: req.params.brand_id }); 
+            if (!products.length) {
+                return res.status(404).json({ message: 'No products found for this brand' });
+            }
+            res.status(200).json(products);
+        } catch (error) {
+            console.error('Error fetching products by brand_id:', error);
+            res.status(500).json({ message: 'Internal Server Error' });
+        }
+    },
+
+    // Get products by category_id
+    getProductsByCategoryId: async (req, res) => {
+        try {
+            const products = await Product.find({ category_id: req.params.category_id }); 
+            if (!products.length) {
+                return res.status(404).json({ message: 'No products found for this category' });
+            }
+            res.status(200).json(products);
+        } catch (error) {
+            console.error('Error fetching products by category_id:', error);
+            res.status(500).json({ message: 'Internal Server Error' });
+        }
+    },
+
+    // Add a new product
+    addProduct: async (req, res) => {
+        try {
+            const newProduct = new Product(req.body); 
+            await newProduct.save();
+            res.status(201).json(newProduct); 
+        } catch (error) {
+            console.error('Error adding product:', error);
+            res.status(500).json({ message: 'Internal Server Error' });
+        }
+    },
+
+    // Update a product by product_id
     updateProduct: async (req, res) => {
         try {
-            const updatedProduct = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true }); // Cập nhật sản phẩm và trả về sản phẩm mới
-            if (!updatedProduct) {
-                return res.status(404).json({ message: 'Product not found' }); // Trả về thông báo nếu không tìm thấy sản phẩm
+            const product = await Product.findOneAndUpdate(
+                { product_id: req.params.product_id },
+                req.body,
+                { new: true } 
+            );
+            if (!product) {
+                return res.status(404).json({ message: 'Product not found' });
             }
-            res.status(200).json(updatedProduct); // Trả về sản phẩm đã cập nhật
+            res.status(200).json(product);
         } catch (error) {
-            res.status(500).json({ message: 'Failed to update product', error: error.message });
+            console.error('Error updating product:', error);
+            res.status(500).json({ message: 'Internal Server Error' });
         }
     },
 
-    // Xóa sản phẩm
+    // Delete a product by product_id
     deleteProduct: async (req, res) => {
         try {
-            const deletedProduct = await Product.findByIdAndDelete(req.params.id); // Xóa sản phẩm theo ID
-            if (!deletedProduct) {
-                return res.status(404).json({ message: 'Product not found' }); // Trả về thông báo nếu không tìm thấy sản phẩm
+            const product = await Product.findOneAndDelete({ product_id: req.params.product_id }); // Find and delete the product
+            if (!product) {
+                return res.status(404).json({ message: 'Product not found' });
             }
-            res.status(200).json({ message: 'Product deleted successfully' }); // Trả về thông báo thành công
+            res.status(204).send(); // No content
         } catch (error) {
-            res.status(500).json({ message: 'Failed to delete product', error: error.message });
+            console.error('Error deleting product:', error);
+            res.status(500).json({ message: 'Internal Server Error' });
         }
     }
 };
