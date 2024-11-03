@@ -12,7 +12,7 @@ router.get('/get/:brand_name', brandController.getBrandByName);
 router.post('/add', upload.single('brand_logo'), brandController.addBrand);
 
 // GET: Get a brand by brand_id
-router.get('/:_id', brandController.getBrandById);
+router.get('/get/:_id', brandController.getBrandById);
 
 // PUT: Update a brand by brand_ids
 router.put('/update/:_id',upload.single('brand_logo') ,brandController.updateBrand);

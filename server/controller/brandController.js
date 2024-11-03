@@ -47,20 +47,16 @@ const brandController = {
         }
     },
 
-    // Add a new brand
+   
     addBrand: async (req, res) => {  
         try {
-           //  brand_name từ req.body
+           
             const {brand_name} = req.body;
-             // Đường dẫn đầy đủ bao gồm tiền tố 'http://localhost:4000/'
             const logoUrl = req.file ? `http://localhost:4000/${req.file.path.replace(/\\/g, '/')}` : '';
-
-            // Check if brand already exists
             const existingBrand = await Brands.findOne({brand_name});
             if (existingBrand) {
                 return res.status(400).json({ message: 'Brand already exists' });
             }
-
             const newBrand = new Brands({brand_name, brand_logo_url:logoUrl });
             await newBrand.save();
 

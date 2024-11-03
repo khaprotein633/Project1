@@ -6,7 +6,7 @@ const ODController = require('../controller/ODController');
 router.get('/get',ODController.getAllOrderDetails);
 
 // Lấy chi tiết đơn hàng theo order_details_id
-router.get('/get/:order_details_id',ODController.getOrderDetailsById);
+router.get('/get/:_id',ODController.getOrderDetailsById);
 
 // Lấy chi tiết đơn hàng theo order_id
 router.get('/get/:order_id',ODController.getOrderDetailsByOrderId);
@@ -15,9 +15,9 @@ router.get('/get/:order_id',ODController.getOrderDetailsByOrderId);
 router.post('/add',ODController.addOrderDetail);
 
 // Cập nhật chi tiết đơn hàng theo order_details_id
-router.put('/update/:order_details_id',ODController.updateOrderDetail);
+router.put('/update/:_id',ODController.updateOrderDetail);
 
 // Xóa chi tiết đơn hàng theo order_details_id
-router.delete('/delete/:order_details_id',ODController.deleteOrderDetail);
+router.delete('/delete/:_id',ODController.deleteOrderDetail);
 
 module.exports = router;

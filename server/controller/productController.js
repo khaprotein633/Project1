@@ -1,7 +1,6 @@
 const Product = require('../model/Product');
 
 const productController = {
-    // Get all products
     getAllProducts: async (req, res) => {
         try {
             const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là 1
@@ -18,7 +17,6 @@ const productController = {
         }
     },
 
-    // Get a product by product_id
     getProductById: async (req, res) => {
         try {
             const product = await Product.findOne({_id: req.params.product_id }); 
@@ -32,7 +30,6 @@ const productController = {
         }
     },
 
-    // Get products by brand_id
     getProductsByBrandId: async (req, res) => {
         try {
             const products = await Product.find({ brand_id: req.params.brand_id }); 
@@ -46,7 +43,6 @@ const productController = {
         }
     },
 
-    // Get products by category_id
     getProductsByCategoryId: async (req, res) => {
         try {
             const products = await Product.find({ category_id: req.params.category_id }); 
@@ -59,8 +55,19 @@ const productController = {
             res.status(500).json({ message: 'Internal Server Error' });
         }
     },
+    getProductsByName: async (req, res) => {
+        try {
+            const products = await Product.find({ product_name: { $regex: req.params.product_name, $options: 'i' } }); 
+            if (!products.length) {
+                return res.status(404).json({ message: 'No products found for this category' });
+            }
+            res.status(200).json(products);
+        } catch (error) {
+            console.error('Error fetching products by category_id:', error);
+            res.status(500).json({ message: 'Internal Server Error' });
+        }
+    },
 
-    // Add a new product
     addProduct: async (req, res) => {
         try {
             const newProduct = new Product(req.body); 
@@ -72,7 +79,6 @@ const productController = {
         }
     },
 
-    // Update a product by product_id
     updateProduct: async (req, res) => {
         try {
             const product = await Product.findOneAndUpdate(
@@ -90,14 +96,13 @@ const productController = {
         }
     },
 
-    // Delete a product by product_id
     deleteProduct: async (req, res) => {
         try {
-            const product = await Product.findOneAndDelete({ product_id: req.params.product_id }); // Find and delete the product
+            const product = await Product.findOneAndDelete({ product_id: req.params.product_id }); 
             if (!product) {
                 return res.status(404).json({ message: 'Product not found' });
             }
-            res.status(204).send(); // No content
+            res.status(204).send(); 
         } catch (error) {
             console.error('Error deleting product:', error);
             res.status(500).json({ message: 'Internal Server Error' });

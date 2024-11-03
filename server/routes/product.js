@@ -10,7 +10,9 @@ router.get('/get', productController.getAllProducts);
 router.get('/get/:_id', productController.getProductById);
 
 // Get products by brand_id
-router.get('/brand/:brand_id', productController.getProductsByBrandId);
+router.get('/get/:brand_id', productController.getProductsByBrandId);
+
+router.get('/get/:product_name', productController.getProductsByName);
 
 // Get products by category_id
 router.get('/get/:category_id', productController.getProductsByCategoryId);
