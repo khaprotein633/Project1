@@ -14,9 +14,9 @@ const CreateBrand = ({ onSuccess }) => {
 
     // Tạo FormData để chứa dữ liệu
     const formData = new FormData();
-    formData.append('brand_name', values.brand_name); // Lấy giá trị từ Ant Design Form
+    formData.append('brand_name', values.brand_name); 
     if (values.brand_logo && values.brand_logo[0]?.originFileObj) {
-      formData.append('brand_logo', values.brand_logo[0].originFileObj); // Lấy file upload từ Ant Design Form
+      formData.append('brand_logo', values.brand_logo[0].originFileObj);
     }
 
     try {
@@ -96,19 +96,6 @@ const CreateBrand = ({ onSuccess }) => {
           </Button>
         </Form.Item>
       </Form>
-
-      <ToastContainer
-        position="top-center"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
     </div>
   );
 };

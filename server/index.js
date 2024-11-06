@@ -17,7 +17,7 @@ const path =require('path')
 // Kết nối route
 
 const categoryRoute = require('./routes/category');
-app.use('/api/categories', categoryRoute);
+app.use('/api/category', categoryRoute);
 
 const brandRoute = require('./routes/brand');
 app.use('/api/brand', brandRoute); 
@@ -37,8 +37,6 @@ app.use('/api/inventory',inventoryRoute);
 const cartRoute = require('./routes/cart')
 app.use('/api/cart',cartRoute);
 
-const imageRoute = require('./routes/product_image');
-app.use('/api/image',imageRoute);
 
 const orderRoute = require('./routes/order');
 app.use('/api/order',orderRoute);

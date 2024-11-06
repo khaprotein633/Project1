@@ -44,7 +44,7 @@ const userController = {
                 ...req.body
             }); 
             await newUser.save();
-            res.status(201).json(newUser); // Trả về người dùng mới được tạo, bao gồm _id
+            res.status(201).json(newUser); 
         } catch (error) {
             console.error('Error adding user:', error);a
             res.status(500).json({ message: 'Internal Server Error' });
@@ -72,8 +72,7 @@ const userController = {
     // Delete a user by user_id
     deleteUser: async (req, res) => {
         try {
-            const {_id } = req.params;
-            const user = await User.findOneAndDelete({ _id}); // Tìm và xóa người dùng
+            const user = await User.findOneAndDelete({ _id:req.params._id}); // Tìm và xóa người dùng
             if (!user) {
                 return res.status(404).json({ message: 'User not found' });
             }

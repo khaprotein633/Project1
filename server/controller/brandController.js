@@ -4,23 +4,33 @@ const brandController = {
     // Retrieve all brands
     getAllBrands: async (req, res) => {
         try {
-            const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là 1
-            const size = parseInt(req.query.size) || 5; // Số mục trên mỗi trang, mặc định là 5
-            const skip = (page - 1) * size; // Số mục cần bỏ qua
+            const page = parseInt(req.query.page) || 1;
+            const size = parseInt(req.query.size) || 5; 
+            const skip = (page - 1) * size; 
     
             const listBrand = await Brands.find({})
                 .skip(skip)
-                .limit(size); // Giới hạn số kết quả trả về
+                .limit(size); 
     
-            const total = await Brands.countDocuments(); // Tổng số mục
+            const total = await Brands.countDocuments(); 
     
             res.status(200).json({ brands: listBrand, total });
         } catch (error) {
             res.status(500).json({ message: 'Error fetching brands', error: error.message });
         }
     }
+    , getAll: async (req, res) => {
+        try {
+            const listBrand = await Brands.find({})
+            res.status(200).json({ listBrand });
+        } catch (error) {
+            res.status(500).json({ message: 'Error fetching brands', error: error.message });
+        }
+    }
     ,
-     // Get brand by brand_id
+    
+    
+
      getBrandById: async (req, res) => {
         try {
             const brand = await Brands.findOne({ _id: req.params._id });
@@ -32,7 +42,7 @@ const brandController = {
             res.status(500).json({ message: 'Error fetching brand', error: error.message });
         }
     },
-     // Get brand by brand_id
+    
      getBrandByName: async (req, res) => {
         try {
             const brand = await Brands.find({ 
@@ -68,19 +78,19 @@ const brandController = {
 
    
 
-   // Update brand by brand_id
+  
     updateBrand: async (req, res) => {
     try {
         const { _id } = req.params;
-        const { brand_name } = req.body; // Lấy brand_name từ req.body
+        const { brand_name } = req.body; 
         const brand_logo_url = req.file ? `http://localhost:4000/${req.file.path.replace(/\\/g, '/')}` : null; // Đường dẫn đầy đủ cho logo
 
-        // Tạo đối tượng cập nhật
+     
         const updateData = {
             brand_name,
         };
 
-        // Chỉ thêm brand_logo_url nếu nó tồn tại
+        
         if (brand_logo_url) {
             updateData.brand_logo_url = brand_logo_url;
         }
@@ -88,7 +98,7 @@ const brandController = {
         const updatedBrand = await Brands.findOneAndUpdate(
             {_id },
             updateData,
-            { new: true } // This option returns the updated document
+            { new: true } 
         );
 
         if (!updatedBrand) {
@@ -102,7 +112,7 @@ const brandController = {
 },
 
 
-    // Delete brand by brand_id
+ 
     deleteBrand: async (req, res) => {
         try {
             const {_id } = req.params;

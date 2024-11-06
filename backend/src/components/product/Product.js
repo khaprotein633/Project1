@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-import { Table, Pagination, Popconfirm, Tooltip, Modal, Button } from 'antd';
-import { EyeOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import { Table, Pagination, Popconfirm, Tooltip, Modal, Button, Image  } from 'antd';
+import { EyeOutlined, DeleteOutlined, PlusOutlined,EditOutlined } from '@ant-design/icons';
 
 //import ProductInfo from './ProductInfo';
 import CreateProduct from './CreateProduct';
+import ProductInfo from './ProductInfo';
+import { toast } from 'react-toastify';
+import UpdateProduct from './UpdateProduct';
 
 const Product = () => {
     const [listProduct, setListProduct] = useState([]);
@@ -15,7 +18,12 @@ const Product = () => {
 
     const [productId, setProductId] = useState('');
     const [productInfoVisible, setProductInfoVisible] = useState(false);
+
     const [createProductVisible, setCreateProductVisible] = useState(false);
+
+    const [editproduct,seteditproduct] = useState(null);
+    const [editform, seteditform] = useState(false);
+    
 
     useEffect(() => {
         fetchProducts(currentPage);
@@ -41,8 +49,9 @@ const Product = () => {
         try {
             await axios.delete(`http://localhost:4000/api/product/delete/${_id}`);
             fetchProducts(currentPage);
-            console.log("Xóa sản phẩm thành công!");
+            toast.success("Xóa sản phẩm thành công!")
         } catch (error) {
+            toast.success("Lỗi khi xóa sản phẩm")
             console.error("Lỗi khi xóa sản phẩm:", error);
         }
     };
@@ -55,18 +64,20 @@ const Product = () => {
         },
         {
             title: 'Hình ảnh',
-            dataIndex: 'product_img',
-            key: 'product_img',
-        },
-        {
-            title: 'Thương hiệu',
-            dataIndex: 'brand_name', // Giả sử bạn đã lấy thông tin thương hiệu kèm theo
-            key: 'brand_name',
+            dataIndex: 'main_image',
+            key: 'main_image',
+            render: (text) => (
+                <Image
+                    style={{ width: '50px', height: '50px', cursor: 'pointer' }}
+                    src={text}
+                />
+
+            ),
         },
         {
             title: 'Mô tả',
-            dataIndex: 'description',
-            key: 'description',
+            dataIndex: 'detail',
+            key: 'detail',
         },
         {
             title: 'Giá',
@@ -83,8 +94,17 @@ const Product = () => {
                         <EyeOutlined
                             style={{ color: '#1890ff', cursor: 'pointer' }}
                             onClick={() => {
-                                setProductInfoVisible(true);
                                 setProductId(record._id);
+                                setProductInfoVisible(true);
+                            }}
+                        />
+                    </Tooltip>  
+                    <Tooltip title="Chỉnh sửa">
+                        <EditOutlined
+                            style={{ color: 'blue', cursor: 'pointer' }}
+                            onClick={() => {
+                                seteditproduct(record);
+                                seteditform(true);
                             }}
                         />
                     </Tooltip>
@@ -115,6 +135,7 @@ const Product = () => {
                 pagination={false}
             />
             <Pagination
+            align='end'
                 current={currentPage}
                 pageSize={pageSize}
                 total={total}
@@ -132,12 +153,30 @@ const Product = () => {
                 title="Thông tin sản phẩm"
                 centered
                 open={productInfoVisible}
-                onOk={() => setProductInfoVisible(false)}
-                onCancel={() => setProductInfoVisible(false)}
+                onOk={() => {setProductInfoVisible(false)
+                     setProductId(null)}}
+                onCancel={() => {setProductInfoVisible(false)
+                    setProductId(null)
+                }}
             >
-                {/* <ProductInfo productId={productId} /> */}
+                <ProductInfo productId={productId}/>
             </Modal>
 
+
+
+            <Modal
+                title="Chỉnh sửa sản phẩm"
+                centered
+                open={editform}
+                onOk={() => seteditform(false)}
+                onCancel={() => seteditform(false)}
+            >
+                {console.log(editproduct)}
+                <UpdateProduct editproduct={editproduct}  onSuccess={() => {
+                        seteditform(false);
+                        fetchProducts();
+                    }}/>
+            </Modal>
             <Modal
                 title="Thêm sản phẩm"
                 centered

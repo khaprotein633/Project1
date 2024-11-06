@@ -1,40 +1,30 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { Image } from 'antd';
 
-
-
-
-
-const ProductInfo = ({productid}) => {
+const ProductInfo = ({ productId }) => {
     const [product, setProduct] = useState(null);
-    const [productimg, setProductimg] = useState([]);
+
     useEffect(() => {
-        console.log("Current product ID:", productid);
-        if (productid) {
-            fetchProduct(); // Gọi hàm fetchUser khi có userid
-            fetchProductIMG();
+        console.log("Current product ID:", product);
+        if (productId) {
+            fetchProduct();
+            console.log("Current product ID:", product);
         }
-    }, [userid]);
+    }, [productId]);
 
     const fetchProduct = async () => {
         try {
-            const res = await axios.get(`http://localhost:4000/api/product/get/${productid}`); 
+            const res = await axios.get(`http://localhost:4000/api/product/get/${productId}`);
             setProduct(res.data.product);
         } catch (err) {
             console.log(err);
         }
     };
-    const fetchProductIMG = async () => {
-        try {
-            const res = await axios.get(`http://localhost:4000/api/image/get/${productid}`); 
-            setUser(res.data.user);
-        } catch (err) {
-            console.log(err);
-        }
-    };
 
-  return (
-    <div className="container mt-4">
-            { product? ( // Kiểm tra nếu user tồn tại mới hiển thị dữ liệu
+    return (
+        <div className="container mt-4">
+            {product ? ( // Kiểm tra nếu product tồn tại mới hiển thị dữ liệu
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     <div>
                         <strong>ID:</strong> {product._id}
@@ -43,23 +33,48 @@ const ProductInfo = ({productid}) => {
                         <strong>Name:</strong> {product.product_name}
                     </div>
                     <div>
-                        <strong>Email:</strong> {product.img}
+                        <strong>Brand ID:</strong> {product.brand_id}
                     </div>
                     <div>
-                        <strong>Password:</strong> {product.password}
+                        <strong>Description:</strong> {product.description}
                     </div>
                     <div>
-                        <strong>Địa chỉ:</strong> {product.address || 'N/A'}
+                        <strong>Detail:</strong> {product.detail}
                     </div>
                     <div>
-                        <strong>Số điện thoại:</strong> {user.phonenumber || 'N/A'}
+                        <strong>Main Image:</strong> <Image 
+                                    style={{ width: '50px', height: '50px', cursor: 'pointer' }}
+                                    src={product.main_image}
+                                />
+                    </div>
+                    <div>
+                        <strong>Images:</strong>
+                        <div style={{ display: 'flex', gap: '10px' }}>
+                            {product.images.map((img, index) => (
+
+                                <Image
+                                key={index}
+                                    style={{ width: '50px', height: '50px', cursor: 'pointer' }}
+                                    src={img}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                    <div>
+                        <strong>Hide:</strong> {product.hide ? 'Yes' : 'No'}
+                    </div>
+                    <div>
+                        <strong>Date Added:</strong> {new Date(product.date_added).toLocaleDateString()}
+                    </div>
+                    <div>
+                        <strong>Date Updated:</strong> {new Date(product.date_updated).toLocaleDateString()}
                     </div>
                 </div>
             ) : (
-                <p>Loading user information...</p> // Hiển thị thông báo trong khi đang tải dữ liệu
+                <p>Loading product information...</p>
             )}
         </div>
-  )
-}
+    );
+};
 
-export default ProductInfo
+export default ProductInfo;

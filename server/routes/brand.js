@@ -5,8 +5,10 @@ const upload = require('../config/upload'); // Import multer configuration
 // Đường dẫn để lấy tất cả thương hiệu
 // GET: Get all brands
 router.get('/get', brandController.getAllBrands);
+router.get('/getall', brandController.getAll);
 
 router.get('/get/:brand_name', brandController.getBrandByName);
+
 
 // POST: Add a new brand
 router.post('/add', upload.single('brand_logo'), brandController.addBrand);

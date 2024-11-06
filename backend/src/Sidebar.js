@@ -42,9 +42,9 @@ const Sidebar = () => {
                     </Link>
                 </li>
                 <li  className= {active===5 ? 'active nav-item p-2 m-1' : 'nav-item p-2  m-1'} onClick={()=>setActive(5)}>
-                    <Link className='p-1 text-white nav-link' to={'/order'}>
+                    <Link className='p-1 text-white nav-link' to={'/category'}>
                         <i className='bi bi-table me-3 fs-5'></i>
-                        <span className='fs-4'> Orders</span>
+                        <span className='fs-4'> Categories</span>
                     </Link>
                 </li>
                 <li  className= {active===6 ? 'active nav-item p-2 m-1' : 'nav-item p-2  m-1'} onClick={()=>setActive(6)}>

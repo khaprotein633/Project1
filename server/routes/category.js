@@ -5,6 +5,7 @@ const router = express.Router();
 
 // GET: Get all categories
 router.get('/get', categoryController.getAllCategories);
+router.get('/getall', categoryController.getAllCate);
 
 // POST: Add a new category
 router.post('/add', categoryController.addCategory);
@@ -13,7 +14,7 @@ router.post('/add', categoryController.addCategory);
 router.get('/get/:_id', categoryController.getCategoryById);
 
 // PUT: Update a category by category_id
-router.put('/put/:_id', categoryController.updateCategory);
+router.put('/update/:_id', categoryController.updateCategory);
 
 // DELETE: Delete a category by category_id
 router.delete('/delete/:_id', categoryController.deleteCategory);

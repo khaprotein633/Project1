@@ -1,17 +1,27 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Select, Button, Input } from 'antd';
+import { Form, Button, Input, Select } from 'antd';
 import axios from 'axios';
-import {toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const CreateUser = ({ onSuccess }) => {
+const UpdateUser = ({ edituser, onSuccess }) => {
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
     const [roles, setRoles] = useState([]);
 
     useEffect(() => {
         fetchRoles();
-    }, []);
+        if (edituser) {
+            form.setFieldsValue({  // Chỉnh sửa từ setFieldValue thành setFieldsValue
+                name: edituser.name,
+                email: edituser.email,
+                password: edituser.password,
+                address: edituser.address,
+                phonenumber: edituser.phonenumber, // Sửa lại từ edituser.address thành edituser.phonenumber
+                role_id: edituser.role_id,
+            });
+        }
+    }, [edituser]);
 
     const fetchRoles = async () => {
         try {
@@ -27,22 +37,15 @@ const CreateUser = ({ onSuccess }) => {
         setLoading(true);
         try {
             // Gửi dữ liệu dưới dạng object bình thường
-            const res = await axios.post('http://localhost:4000/api/user/add', {
-                name: values.name,
-                email: values.email,
-                password: values.password,
-                address: values.address,
-                phonenumber: values.phonenumber,
-                role_id: values.role_id,
-            });
+            const res = await axios.put(`http://localhost:4000/api/user/update/${edituser._id}`, values);
 
             // Reset form nếu thành công
             form.resetFields();
             if (onSuccess) {
                 onSuccess();
-              }
-            toast.success('Thêm user thành công!');
-            
+            }
+            toast.success('Cập nhật thành công!');
+
         } catch (err) {
             // Hiển thị lỗi chi tiết từ API nếu có
             if (err.response && err.response.data) {
@@ -60,7 +63,7 @@ const CreateUser = ({ onSuccess }) => {
         <div className="container mt-4">
             <Form
                 form={form}
-                name="create-user"
+                name="update-user"
                 labelCol={{ span: 8 }}
                 wrapperCol={{ span: 16 }}
                 onFinish={handleSubmit}
@@ -109,7 +112,7 @@ const CreateUser = ({ onSuccess }) => {
                 <Form.Item
                     label="Phân quyền"
                     name="role_id"
-                    rules={[{ required: true, message: 'Vui lòng phân quyền cho user!' }]}
+                    rules={[{ required: true, message: 'Vui lòng phân quyền cho người dùng!' }]}
                 >
                     <Select>
                         {roles.map(item => (
@@ -120,12 +123,12 @@ const CreateUser = ({ onSuccess }) => {
 
                 <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
                     <Button type="primary" htmlType="submit" loading={loading}>
-                        Tạo User
+                        Cập nhật người dùng
                     </Button>
                 </Form.Item>
-            </Form> 
+            </Form>
         </div>
     );
 };
 
-export default CreateUser;
+export default UpdateUser;

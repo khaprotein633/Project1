@@ -4,8 +4,23 @@ const categoryController = {
     // Get all categories
     getAllCategories: async (req, res) => {
         try {
-            const categories = await Category.find({});
-            res.status(200).json(categories);
+            const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là 1
+            const size = parseInt(req.query.size) || 5; // Số mục trên mỗi trang, mặc định là 5
+            const skip = (page - 1) * size; // Số mục cần bỏ qua
+
+            const list = await Category.find({}).skip(skip).limit(size); 
+            const total = await Category.countDocuments();
+
+
+            res.status(200).json({list,total});
+        } catch (error) {
+            res.status(500).json({ message: 'Error fetching categories', error: error.message });
+        }
+    },
+    getAllCate: async (req, res) => {
+        try {
+            const list = await Category.find({})
+            res.status(200).json({list});
         } catch (error) {
             res.status(500).json({ message: 'Error fetching categories', error: error.message });
         }
@@ -14,15 +29,14 @@ const categoryController = {
     // Add a new category
     addCategory: async (req, res) => {
         try {
-            const { category_id, category_name, parent_category_id } = req.body;
-
+            const {category_name} = req.body;
             // Check if category already exists
-            const existingCategory = await Category.findOne({ category_id });
+            const existingCategory = await Category.findOne({ category_name});
             if (existingCategory) {
                 return res.status(400).json({ message: 'Category already exists' });
             }
 
-            const newCategory = new Category({ category_id, category_name, parent_category_id });
+            const newCategory = new Category({category_name});
             await newCategory.save();
 
             res.status(201).json(newCategory);
@@ -47,12 +61,12 @@ const categoryController = {
     // Update category by category_id
     updateCategory: async (req, res) => {
         try {
-            const { category_id } = req.params;
-            const { category_name, parent_category_id } = req.body;
+            const {_id } = req.params;
+            const { category_name, parent_id } = req.body;
 
             const updatedCategory = await Category.findOneAndUpdate(
-                { category_id },
-                { category_name, parent_category_id },
+                {_id },
+                { category_name, parent_id },
                 { new: true }
             );
 
@@ -69,8 +83,8 @@ const categoryController = {
     // Delete category by category_id
     deleteCategory: async (req, res) => {
         try {
-            const { category_id } = req.params;
-            const deletedCategory = await Category.findOneAndDelete({ category_id });
+            
+            const deletedCategory = await Category.findOneAndDelete({_id:req.params._id });
 
             if (!deletedCategory) {
                 return res.status(404).json({ message: 'Category not found' });

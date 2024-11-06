@@ -17,6 +17,7 @@ import Brand from './components/brand/Brand';
 import CreateBrand from './components/brand/CreateBrand';
 import User from './components/user/User';
 import Product from './components/product/Product';
+import Category from './components/category/Category';
 
 const router = createBrowserRouter([
   {
@@ -47,6 +48,10 @@ const router = createBrowserRouter([
       {
         path: "product",
         element: <Product/>
+      },
+      {
+        path: "category",
+        element: <Category/>
       },
       {
         path: "report",
