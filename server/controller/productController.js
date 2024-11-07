@@ -3,9 +3,9 @@ const Product = require('../model/Product');
 const productController = {
     getAllProducts: async (req, res) => {
         try {
-            const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là 1
-            const size = parseInt(req.query.size) || 5; // Số mục trên mỗi trang, mặc định là 5
-            const skip = (page - 1) * size; // Số mục cần bỏ qua
+            const page = parseInt(req.query.page) || 1; 
+            const size = parseInt(req.query.size) || 5; 
+            const skip = (page - 1) * size; 
 
             const products = await Product.find({}).skip(skip).limit(size);
             const total = await Product.countDocuments();

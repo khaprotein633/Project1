@@ -1,10 +1,9 @@
 const Order = require('../model/Order');
 
 const orderController = {
-    // Get all orders
     getAllOrders: async (req, res) => {
         try {
-            const orders = await Order.find(); // Lấy tất cả các đơn hàng
+            const orders = await Order.find(); 
             res.status(200).json(orders);
         } catch (error) {
             console.error('Error fetching orders:', error);
@@ -12,10 +11,9 @@ const orderController = {
         }
     },
 
-    // Get an order by orders_id
     getOrderById: async (req, res) => {
         try {
-            const order = await Order.findOne({ orders_id: req.params.orders_id }); // Tìm đơn hàng theo orders_id
+            const order = await Order.findOne({ orders_id: req.params.orders_id });
             if (!order) {
                 return res.status(404).json({ message: 'Order not found' });
             }
@@ -25,11 +23,9 @@ const orderController = {
             res.status(500).json({ message: 'Internal Server Error' });
         }
     },
-
-    // Get orders by user_id
     getOrdersByUserId: async (req, res) => {
         try {
-            const orders = await Order.find({ user_id: req.params.user_id }); // Tìm đơn hàng theo user_id
+            const orders = await Order.find({ user_id: req.params.user_id });
             if (!orders.length) {
                 return res.status(404).json({ message: 'No orders found for this user' });
             }
@@ -40,12 +36,12 @@ const orderController = {
         }
     },
 
-    // Add a new order
+    
     addOrder: async (req, res) => {
         try {
-            const newOrder = new Order(req.body); // Tạo đơn hàng mới
-            await newOrder.save(); // Lưu vào database
-            res.status(201).json(newOrder); // Trả về đơn hàng mới được thêm
+            const newOrder = new Order(req.body);
+            await newOrder.save(); 
+            res.status(201).json(newOrder); 
         } catch (error) {
             console.error('Error adding order:', error);
             res.status(500).json({ message: 'Internal Server Error' });

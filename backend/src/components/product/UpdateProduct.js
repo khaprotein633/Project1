@@ -67,15 +67,13 @@ const UpdateProduct = ({ editproduct, onSuccess }) => {
     const handleRemoveImage = async (file) => {
         const imageUrl = file.url || file.preview;
     
-        // Sử dụng callback để đảm bảo `removeImages` được cập nhật với giá trị mới nhất
         setRemoveImages((prev) => {
             const updatedList = [...prev, imageUrl];
-            console.log("Updated removeImages list:", updatedList);  // In ra danh sách cập nhật
+            console.log("Updated removeImages list:", updatedList);  
             return updatedList;
         });
     };
     
-    // Thêm useEffect để kiểm tra `removeImages` mỗi khi nó thay đổi
     useEffect(() => {
         console.log("Current removeImages:", removeImages);
     }, [removeImages]);

@@ -6,11 +6,9 @@ const ProductInfo = ({ productId }) => {
     const [product, setProduct] = useState(null);
 
     useEffect(() => {
-        console.log("Current product ID:", product);
-        if (productId) {
-            fetchProduct();
-            console.log("Current product ID:", product);
-        }
+         fetchProduct();
+            
+    
     }, [productId]);
 
     const fetchProduct = async () => {

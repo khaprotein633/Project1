@@ -11,7 +11,7 @@ router.get('/get/:brand_name', brandController.getBrandByName);
 
 
 // POST: Add a new brand
-router.post('/add', upload.single('brand_logo'), brandController.addBrand);
+router.post('/add', upload.single('brand_logo') , brandController.addBrand);
 
 // GET: Get a brand by brand_id
 router.get('/get/:_id', brandController.getBrandById);

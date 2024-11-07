@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-import { Table, Pagination, Popconfirm, Tooltip, Modal, Button, Image  } from 'antd';
-import { EyeOutlined, DeleteOutlined, PlusOutlined,EditOutlined } from '@ant-design/icons';
+import { Table, Pagination, Popconfirm, Tooltip, Modal, Button, Image } from 'antd';
+import { EyeOutlined, DeleteOutlined, PlusOutlined, EditOutlined, StockOutlined } from '@ant-design/icons';
 
-//import ProductInfo from './ProductInfo';
 import CreateProduct from './CreateProduct';
 import ProductInfo from './ProductInfo';
 import { toast } from 'react-toastify';
 import UpdateProduct from './UpdateProduct';
+import Inventory from '../inventory/Inventory';
 
 const Product = () => {
     const [listProduct, setListProduct] = useState([]);
@@ -21,11 +21,14 @@ const Product = () => {
 
     const [createProductVisible, setCreateProductVisible] = useState(false);
 
-    const [editproduct,seteditproduct] = useState(null);
+    const [editproduct, seteditproduct] = useState(null);
     const [editform, seteditform] = useState(false);
-    
+
+    const [editInventory, setEditInventory] = useState(false);
+
 
     useEffect(() => {
+        setProductId('');
         fetchProducts(currentPage);
     }, [currentPage]);
 
@@ -98,13 +101,22 @@ const Product = () => {
                                 setProductInfoVisible(true);
                             }}
                         />
-                    </Tooltip>  
+                    </Tooltip>
                     <Tooltip title="Chỉnh sửa">
                         <EditOutlined
                             style={{ color: 'blue', cursor: 'pointer' }}
                             onClick={() => {
                                 seteditproduct(record);
                                 seteditform(true);
+                            }}
+                        />
+                    </Tooltip>
+                    <Tooltip title="Quản lý tồn kho">
+                        <StockOutlined
+                            style={{ color: 'green', cursor: 'pointer' }}
+                            onClick={() => {
+                                setProductId(record._id); 
+                                setEditInventory(true);  
                             }}
                         />
                     </Tooltip>
@@ -135,7 +147,7 @@ const Product = () => {
                 pagination={false}
             />
             <Pagination
-            align='end'
+                align='end'
                 current={currentPage}
                 pageSize={pageSize}
                 total={total}
@@ -153,29 +165,54 @@ const Product = () => {
                 title="Thông tin sản phẩm"
                 centered
                 open={productInfoVisible}
-                onOk={() => {setProductInfoVisible(false)
-                     setProductId(null)}}
-                onCancel={() => {setProductInfoVisible(false)
-                    setProductId(null)
+                onClose={() => {
+                    setProductInfoVisible(false)
+                    setProductId('')
+                }}
+                onOk={() => {
+                    setProductInfoVisible(false)
+                    setProductId('')
+                }}
+                onCancel={() => {
+                    setProductInfoVisible(false)
+                    setProductId('')
                 }}
             >
-                <ProductInfo productId={productId}/>
+                <ProductInfo productId={productId} />
             </Modal>
 
+            <Modal
+                title="Hàng tồn kho"
+                centered
+                open={editInventory}
+                onCancel={() => {
+                    setEditInventory(false);
+                    
+                }}
+                onOk={() => {
+                    setEditInventory(false);
+                   
+                }}
+                width={1000}
+            >
+                <Inventory product_id={productId} />
+            </Modal>
 
 
             <Modal
                 title="Chỉnh sửa sản phẩm"
                 centered
                 open={editform}
+                onClose={() => {seteditform(false)
+                    seteditproduct(null)
+                }}
                 onOk={() => seteditform(false)}
                 onCancel={() => seteditform(false)}
             >
-                {console.log(editproduct)}
-                <UpdateProduct editproduct={editproduct}  onSuccess={() => {
-                        seteditform(false);
-                        fetchProducts();
-                    }}/>
+                <UpdateProduct editproduct={editproduct} onSuccess={() => {
+                    seteditform(false);
+                    fetchProducts();
+                }} />
             </Modal>
             <Modal
                 title="Thêm sản phẩm"
