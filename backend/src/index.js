@@ -8,9 +8,7 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
-import Users from './components/home/Users';
 
-import Orders from './components/home/Orders';
 import NotFoundPage from './components/home/NotFoundPage';
 import Home from './components/home/Home';
 import Brand from './components/brand/Brand';
@@ -18,6 +16,7 @@ import CreateBrand from './components/brand/CreateBrand';
 import User from './components/user/User';
 import Product from './components/product/Product';
 import Category from './components/category/Category';
+import Order from './components/order/Order';
 
 const router = createBrowserRouter([
   {
@@ -43,7 +42,7 @@ const router = createBrowserRouter([
       },
       {
         path: "order",
-        element: <Orders />
+        element: <Order/>  
       },
       {
         path: "product",
