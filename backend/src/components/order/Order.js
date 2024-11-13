@@ -120,7 +120,7 @@ const Order = () => {
             <Table
                 columns={columns}
                 dataSource={listOrder}
-                rowKey="order_id"
+                rowKey="_id"
                 pagination={{ current: currentPage, pageSize, total }}
                 onChange={handleTableChange}
                 bordered
