@@ -7,10 +7,12 @@ import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import Home from "./Pages/Home.jsx";
-import { loadUser } from "./Redux/actions/user.js";
 import Store from "./Redux/store.js";
 import Authentication from "./Pages/Authentication.jsx";
 import { getAllProducts } from "./Redux/actions/product.js";
+import Trendy from "./Components/Home/Trendy/Trendy.jsx";
+import ProfilePage from "./Pages/ProfilePage.jsx";
+import { useSelector } from "react-redux";
 
 
 function App() {
@@ -26,6 +28,8 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Authentication />} />
+        <Route path="/shop" element={<Trendy />} />
+        <Route path="/profile" element={<ProfilePage />} />
 
       </Routes>
 

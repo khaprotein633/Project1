@@ -12,6 +12,6 @@ router.get('/get/:user_id', wishlistController.getWishListByUserId);
 router.post('/add', wishlistController.addWishList);
 
 // Xóa danh sách yêu thích theo wishlist_id
-router.delete('/delete/:wishlist_id', wishlistController.deleteWishList);
+router.delete('/delete/:_id', wishlistController.deleteWishList);
 
 module.exports = router;

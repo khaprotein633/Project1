@@ -7,19 +7,17 @@ import StoreData from "../../../Data/StoreData";
 import { FiHeart } from "react-icons/fi";
 import { FaStar, FaCartPlus } from "react-icons/fa";
 import toast from "react-hot-toast";
-import { getAllProducts } from "../../../Redux/actions/product";
+// import { getAllProducts } from "../../../Redux/actions/product";
 
-const Trendy = () => {
-  const dispatch = useDispatch();
+const Trendy = ({allProducts}) => {
+  // const dispatch = useDispatch();
   const [activeTab, setActiveTab] = useState("tab1");
   const [wishList, setWishList] = useState({});
-  const { allProducts } = useSelector((state) => state.product);
-console.log(allProducts)
-useEffect(() => {
-    // Store.dispatch(loadUser());
-    dispatch(getAllProducts());
+  // useEffect(() => {
+  //   // Store.dispatch(loadUser());
+  //   dispatch(getAllProducts());
 
-  }, []);
+  // }, []);
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
@@ -122,17 +120,17 @@ useEffect(() => {
             {/* Tab 1 */}
             {activeTab === "tab1" && (
               <div className="trendyMainContainer">
-                {allProducts.slice(0, 8).map((product) => (
+                {allProducts?.slice(0, 8).map((product) => (
                   <div className="trendyProductContainer" key={product.id}>
                     <div className="trendyProductImages">
                       <Link to="/Product" onClick={scrollToTop}>
                         <img
-                          src={product.frontImg}
+                          src={product.main_image}
                           alt=""
                           className="trendyProduct_front"
                         />
                         <img
-                          src={product.backImg}
+                          src={product.images[0]}
                           alt=""
                           className="trendyProduct_back"
                         />
@@ -186,7 +184,7 @@ useEffect(() => {
             {/* Tab 2 */}
             {activeTab === "tab2" && (
               <div className="trendyMainContainer">
-                {StoreData.slice(0, 8)
+                {StoreData?.slice(0, 8)
                   .reverse()
                   .map((product) => (
                     <div className="trendyProductContainer" key={product.id}>
@@ -254,7 +252,7 @@ useEffect(() => {
             {/* Tab 3 */}
             {activeTab === "tab3" && (
               <div className="trendyMainContainer">
-                {StoreData.slice(0, 8)
+                {StoreData?.slice(0, 8)
                   .sort(sortByReviews)
                   .map((product) => (
                     <div className="trendyProductContainer" key={product.id}>
@@ -322,7 +320,7 @@ useEffect(() => {
             {/* Tab 4 */}
             {activeTab === "tab4" && (
               <div className="trendyMainContainer">
-                {StoreData.slice(0, 8)
+                {StoreData?.slice(0, 8)
                   .sort(sortByPrice)
                   .map((product) => (
                     <div className="trendyProductContainer" key={product.id}>

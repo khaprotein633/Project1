@@ -3,18 +3,18 @@ const router = express.Router();
 const commentController = require('../controller/commentController');
 
 // Route để lấy tất cả các nhận xét
-router.get('/', commentController.getAllComments);
+router.get('/get', commentController.getAllComments);
 
 // Route để lấy các nhận xét theo product_id
-router.get('/product/:product_id', commentController.getCommentsByProductId);
+router.get('/get/:_id', commentController.getCommentsByProductId);
 
 // Route để thêm mới một nhận xét
-router.post('/', commentController.addComment);
+router.post('/add', commentController.addComment);
 
 // Route để cập nhật một nhận xét theo product_review_id
-router.put('/:product_review_id', commentController.updateComment);
+router.put('/update/:_id', commentController.updateComment);
 
 // Route để xóa một nhận xét theo product_review_id
-router.delete('/:product_review_id', commentController.deleteComment);
+router.delete('/delete/:_id', commentController.deleteComment);
 
 module.exports = router;

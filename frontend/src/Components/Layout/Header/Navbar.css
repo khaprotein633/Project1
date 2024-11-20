@@ -244,3 +244,59 @@
 .mobile-menuSocial_links svg {
   cursor: pointer;
 }
+.cartPopup {
+  position: fixed;
+  right: 20px;
+  top: 70px;
+  width: 300px;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  z-index: 1000;
+}
+
+.cartPopup h3 {
+  margin-top: 0;
+}
+
+.cartItemsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.cartItem {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.cartTotal {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+  margin-top: 20px;
+}
+
+.checkoutButton {
+  display: block;
+  text-align: center;
+  background-color: #a4b08f;
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  text-decoration: none;
+  margin-top: 15px;
+}
+
+.closePopupButton {
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  margin-top: 10px;
+  text-align: center;
+  width: 100%;
+}

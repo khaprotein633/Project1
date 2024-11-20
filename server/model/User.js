@@ -1,14 +1,13 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-  role_id: { type: Number, ref: 'Role' },
+  role_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Role' },
   name: { type: String, required: true },
   password: { type: String, required: true },
   email: { type: String, required: true, unique: true },
-  address: String,
-  phonenumber: String,
-  account_date: { type: Date, default: Date.now },
-  is_active: { type: Number, default: 1 }
+  address: {type:String},
+  phonenumber: {type:String},
+  account_date: { type: Date, default: Date.now }
 },{ versionKey: false });
 
 module.exports = mongoose.model('User', userSchema);

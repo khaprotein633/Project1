@@ -7,7 +7,7 @@ const orderSchema = new mongoose.Schema({
   delivery_date: Date, 
   shipping_address: { type: String, required: true }, 
   user_phone: { type: String, required: true }, 
-  order_status_id: { type: Number, ref: 'OrderStatus', required: true }, 
+  order_status_id: { type: String, ref: 'OrderStatus', required: true }, 
   payment_status: { type: String, required: true }
 },{ versionKey: false });
 

@@ -6,15 +6,24 @@ import Trendy from "../Components/Home/Trendy/Trendy";
 import DealTimer from "../Components/Home/Deal/DealTimer";
 import Banner from "../Components/Home/Banner/Banner";
 import LimitedEdition from "../Components/Home/Limited/LimitedEdition";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { getAllProducts } from "../Redux/actions/product";
 
 
 const Home = () => {
+  const { allProducts } = useSelector((state) => state.product);
+  const {user} = useSelector((state)=> state)
+  console.log("user in nav",user);
+  // console.log(allProducts)
+
     return (
      <div>
       <Navbar/>
       <HeroSection />
       <CollectionBox/>
-      <Trendy />
+      {allProducts && <Trendy allProducts={allProducts}/>}
+
       <DealTimer />
       <Banner />
       <LimitedEdition />

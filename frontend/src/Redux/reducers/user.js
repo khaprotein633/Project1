@@ -4,58 +4,51 @@ const initialState = {
 };
 
 export const userReducer = createReducer(initialState, {
-  LoadUserRequest: (state) => {
+
+
+  loginUserRequest: (state) => {
     state.loading = true;
   },
-  LoadUserSuccess: (state, action) => {
+  loginUserSuccess: (state, action) => {
     state.isAuthenticated = true;
     state.loading = false;
     state.user = action.payload;
   },
-  LoadUserFail: (state, action) => {
+  loginUserFail: (state, action) => {
     state.loading = false;
     state.error = action.payload;
     state.isAuthenticated = false;
   },
-  // update user information
-  updateUserInfoRequest: (state) => {
+
+  registerUserRequest: (state) => {
     state.loading = true;
   },
-  updateUserInfoSuccess: (state, action) => {
+  registerUserSuccess: (state, action) => {
+    state.success = true;
     state.loading = false;
     state.user = action.payload;
   },
-  updateUserInfoFailed: (state, action) => {
+  registerUserFail: (state, action) => {
     state.loading = false;
     state.error = action.payload;
+    state.success = false;
   },
 
-  // update user address
-  updateUserAddressRequest: (state) => {
-    state.addressloading = true;
+
+  logoutUserRequest: (state) => {
+    state.loading = true;
   },
-  updateUserAddressSuccess: (state, action) => {
-    state.addressloading = false;
-    state.successMessage = action.payload.successMessage;
-    state.user = action.payload.user;
+  logoutUserSuccess: (state, action) => {
+    state.isAuthenticated = false;
+    state.loading = false;
+    state.user = null;
   },
-  updateUserAddressFailed: (state, action) => {
-    state.addressloading = false;
-    state.error = action.payload;
+  logoutUserFail: (state, action) => {
+    state.loading = false;
+    state.isAuthenticated = true;
   },
 
-  // get all users --- admin
-  getAllUsersRequest: (state) => {
-    state.usersLoading = true;
-  },
-  getAllUsersSuccess: (state, action) => {
-    state.usersLoading = false;
-    state.users = action.payload;
-  },
-  getAllUsersFailed: (state, action) => {
-    state.usersLoading = false;
-    state.error = action.payload;
-  },
+
   clearErrors: (state) => {
     state.error = null;
   },

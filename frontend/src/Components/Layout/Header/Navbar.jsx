@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./Navbar.css";
 
 // import { useSelector } from "react-redux";
 
 import logo from "../../../Assets/logo.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { RiMenu2Line } from "react-icons/ri";
 import { FiSearch } from "react-icons/fi";
@@ -22,17 +22,37 @@ import { FaYoutube } from "react-icons/fa";
 import { FaPinterest } from "react-icons/fa";
 
 import Badge from "@mui/material/Badge";
+import { useDispatch, useSelector } from "react-redux";
+import { logoutUser } from "../../../Redux/actions/user";
+import { getCartByUserId } from "../../../Redux/actions/cart";
+import axios from "axios";
+import { server } from "../../../Config/server";
 
 const Navbar = () => {
-  const cart = []
-
+  const [cartPopupOpen, setCartPopupOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [productDetails, setProductDetails] = useState([]);
+  const [loadedProductIds, setLoadedProductIds] = useState(new Set()); // Track loaded products
+  const [total, setTotal] = useState(0);
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { user, isAuthenticated } = useSelector((state) => state.user);
+  const { cart } = useSelector((state) => state.cart);
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
     document.body.style.overflow = mobileMenuOpen ? "auto" : "hidden";
   };
 
+  const toggleCartPopup = () => {
+    setCartPopupOpen(!cartPopupOpen);
+  };
+
+  const handleLogout = () => {
+    dispatch(logoutUser());
+    navigate("/loginSignUp");
+  };
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
@@ -40,8 +60,52 @@ const Navbar = () => {
     });
   };
 
+  useEffect(() => {
+    if (user) {
+      dispatch(getCartByUserId(user._id));
+    }
+  }, [dispatch, user]);
+
+  useEffect(() => {
+    const fetchProductDetails = async () => {
+      if (cart && cart[0] && cart[0].items) {
+        const items = cart[0].items.filter((item) => !loadedProductIds.has(item.productId));
+
+        if (items.length === 0) return; // Skip if all products are already loaded
+
+        try {
+          const promises = items.map((item) =>
+            axios.get(`${server}/product/get/${item.productId}`)
+          );
+
+          const responses = await Promise.all(promises);
+          const products = responses.map((response) => response.data);
+
+          setProductDetails(products);
+
+        } catch (error) {
+          console.error("Error fetching product details:", error);
+        }
+      }
+    };
+
+    fetchProductDetails();
+  }, [cart, loadedProductIds]);
+
+  useEffect(() => {
+    if (cart && cart[0] && cart[0].items && productDetails) {
+      setTotal(cart[0]?.totalPrice);
+    }else{
+      setTotal(0);
+    }
+
+  }, [cart,productDetails]);
+  console.log("cart",cart);
+
+
   return (
-    <>
+    productDetails &&<>
+
       {/* Desktop Menu */}
       <nav className="navBar">
         <div className="logoLinkContainer">
@@ -82,26 +146,64 @@ const Navbar = () => {
         </div>
         <div className="iconContainer">
           <FiSearch size={22} onClick={scrollToTop} />
-          <Link to="/loginSignUp" onClick={scrollToTop}>
-            <FaRegUser size={22} />
-          </Link>
-          <Link to="/cart" onClick={scrollToTop}>
+          {user ? (
+            <>
+              <Link to="/profile">
+                <FaRegUser size={22} />
+              </Link>
+              <Link to="/login" onClick={handleLogout}>
+                Logout
+              </Link>
+            </>
+          ) : (
+            <Link to="/login" onClick={scrollToTop}>
+              <FaRegUser size={22} />
+            </Link>
+          )}
+
+          <div onClick={toggleCartPopup} style={{ position: "relative", cursor: "pointer" }}>
             <Badge
-              badgeContent={cart?.items?.length === 0 ? "0" : cart?.items?.length}
+              // badgeContent={cart.items?.length || 0}
               color="primary"
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "right",
-              }}
+              anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
             >
               <RiShoppingBagLine size={22} />
             </Badge>
-          </Link>
+          </div>
           <FiHeart size={22} onClick={scrollToTop} />
           {/* <RiMenu2Line size={22} /> */}
         </div>
       </nav>
-
+      {/* Popup Cart */}
+      {cartPopupOpen && (
+        <div className="cartPopup">
+          <h3>Your Cart</h3>
+          {productDetails && productDetails?.length > 0 ? (
+            <>
+              <ul className="cartItemsList">
+                {productDetails.map((item) => (
+                  <li key={item.id} className="cartItem">
+                    <div>
+                      <strong>{item.product.product_name}</strong>
+                      <p>{item.product.description}</p>
+                    </div>
+                    <span>{item.product.price}</span>
+                  </li>
+                ))}
+              </ul>
+              <div className="cartTotal">
+                <p>Total: {total}</p>
+              </div>
+              <Link to="/checkout" onClick={toggleCartPopup} className="checkoutButton">
+                Continue to Checkout
+              </Link>
+            </>
+          ) : (
+            <p>Your cart is empty</p>
+          )}
+          <button onClick={toggleCartPopup} className="closePopupButton">Close</button>
+        </div>
+      )}
       {/* Mobile Menu */}
       <nav>
         <div className="mobile-nav">
@@ -115,18 +217,15 @@ const Navbar = () => {
               <img src={logo} alt="Logo" />
             </Link>
           </div>
-          <Link to="/cart">
+          <div onClick={toggleCartPopup} style={{ position: "relative", cursor: "pointer" }}>
             <Badge
-              badgeContent={cart?.items?.length === 0 ? "0" : cart?.items?.length}
+              // badgeContent={cart.items?.length || 0}
               color="primary"
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "right",
-              }}
+              anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
             >
-              <RiShoppingBagLine size={22} color="black" />
+              <RiShoppingBagLine size={22} />
             </Badge>
-          </Link>
+          </div>
         </div>
         <div className={`mobile-menu ${mobileMenuOpen ? "open" : ""}`}>
           <div className="mobile-menuTop">

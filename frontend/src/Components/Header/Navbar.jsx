@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./Navbar.css";
 
-// import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import logo from "../../Assets/logo.png";
 import { Link } from "react-router-dom";
@@ -22,9 +22,13 @@ import { FaYoutube } from "react-icons/fa";
 import { FaPinterest } from "react-icons/fa";
 
 import Badge from "@mui/material/Badge";
+import { logoutUser } from "../../Redux/actions/user";
 
 const Navbar = () => {
+  const {user} = useSelector((state)=> state.user)
+  console.log("user in nav",user);
   const cart = []
+  const dispatch = useDispatch();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -38,6 +42,10 @@ const Navbar = () => {
       top: 0,
       behavior: "smooth",
     });
+  };
+  const handleLogout = () => {
+    dispatch(logoutUser()); // Dispatch logout action
+    // Optionally, you can add a confirmation before dispatching logout
   };
 
   return (
@@ -84,6 +92,9 @@ const Navbar = () => {
           <FiSearch size={22} onClick={scrollToTop} />
           <Link to="/loginSignUp" onClick={scrollToTop}>
             <FaRegUser size={22} />
+          </Link>
+          <Link to="/login" onClick={handleLogout}>
+            Logout
           </Link>
           <Link to="/cart" onClick={scrollToTop}>
             <Badge

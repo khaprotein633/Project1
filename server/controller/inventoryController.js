@@ -4,7 +4,8 @@ const inventoryController = {
     // Get all inventory records
     getAllInventory: async (req, res) => {
         try {
-            const inventory = await Inventory.find(); // Lấy tất cả các bản ghi trong kho
+            
+            const inventory = await Inventory.find();
             res.status(200).json(inventory);
         } catch (error) {
             console.error('Error fetching inventory:', error);
@@ -12,58 +13,90 @@ const inventoryController = {
         }
     },
 
-    // Get inventory by product_id
+
     getInventoryByProductId: async (req, res) => {
         try {
-            const inventory = await Inventory.find({ product_id: req.params.product_id }); // Tìm kho theo product_id
-            if (!inventory.length) {
+            const page = parseInt(req.query.page) || 1; 
+            const size = parseInt(req.query.size) || 5; 
+            const skip = (page - 1) * size; 
+            const list = await Inventory.find({ product_id: req.params.product_id }).skip(skip).limit(size);;
+            const total = await Inventory.countDocuments();
+            if (!list.length) {
                 return res.status(404).json({ message: 'No inventory found for this product' });
             }
-            res.status(200).json(inventory);
+            res.status(200).json({list,total});
+        } catch (error) {
+            console.error('Error fetching inventory:', error);
+            res.status(500).json({ message: 'Internal Server Error' });
+        }
+    },
+    getInventoryById: async (req, res) => {
+        try {
+            const inventory = await Inventory.findOne({_id: req.params._id });
+            if (!inventory) {
+                return res.status(404).json({ message: 'not found' });
+            }
+            
+            res.status(200).json({inventory});
         } catch (error) {
             console.error('Error fetching inventory:', error);
             res.status(500).json({ message: 'Internal Server Error' });
         }
     },
 
-    // Add new inventory
+
     addInventory: async (req, res) => {
         try {
-            const newInventory = new Inventory(req.body); // Tạo một bản ghi mới trong kho
-            await newInventory.save(); // Lưu bản ghi vào cơ sở dữ liệu
+            const { product_id, size, color, price, quantity } = req.body;
+            const image_url = req.file ? `http://localhost:4000/${req.file.path.replace(/\\/g, '/')}` : '';
+    
+           
+            const newInventory = new Inventory({
+                product_id,
+                size,
+                color,
+                price,
+                quantity,
+                image_url:image_url
+            });
+            await newInventory.save();
             res.status(201).json(newInventory);
         } catch (error) {
-            console.error('Error adding inventory:', error);
-            res.status(500).json({ message: 'Internal Server Error' });
+            console.error('Lỗi khi thêm kho hàng:', error);
+            res.status(500).json({ message: 'Lỗi máy chủ nội bộ' });
         }
     },
+    
 
-    // Update inventory by product_id
+
     updateInventory: async (req, res) => {
         try {
-            const inventory = await Inventory.findOneAndUpdate(
-                { product_id: req.params.product_id, size: req.body.size, color: req.body.color }, // Tìm kho theo product_id, size và color
-                req.body,
-                { new: true } // Trả về bản ghi đã được cập nhật
-            );
+
+            const image_url = req.file ? `http://localhost:4000/${req.file.path.replace(/\\/g, '/')}` : '';
+    
+            const inventory = await Inventory.findById(req.params._id);
             if (!inventory) {
                 return res.status(404).json({ message: 'Inventory not found' });
             }
-            res.status(200).json(inventory);
+            Object.assign(inventory, req.body);
+            if (image_url) {
+                inventory.image_url = image_url;
+            }
+            const updatedInventory = await inventory.save();
+            res.status(200).json(updatedInventory);
         } catch (error) {
             console.error('Error updating inventory:', error);
             res.status(500).json({ message: 'Internal Server Error' });
         }
     },
 
+
     // Delete inventory by product_id, size, and color
     deleteInventory: async (req, res) => {
         try {
-            const inventory = await Inventory.findOneAndDelete({ 
-                product_id: req.params.product_id, 
-                size: req.body.size, 
-                color: req.body.color 
-            }); // Tìm và xóa bản ghi trong kho
+            const inventory = await Inventory.findOneAndDelete({
+                _id: req.params._id, 
+            });
             if (!inventory) {
                 return res.status(404).json({ message: 'Inventory not found' });
             }

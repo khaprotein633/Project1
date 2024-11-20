@@ -1,40 +1,16 @@
 const mongoose = require('mongoose');
-const { uuidv4 } = require('uuid'); // If using UUIDs
 
-// Định nghĩa schema cho ShoppingCart
-const shoppingCartSchema = new mongoose.Schema({
-  user_id: {
-    type: String,
-    ref: 'User',
-    required: true
-  },
+const cartSchema = new mongoose.Schema({
+    userId: { type: String, required: true },
+    items: [
+        {
+            productId: { type: String,  },
+            quantity: { type: Number,  min: 1 }
+        }
+    ],
+    totalPrice: { type: Number}
+});
 
-  product_id: {
-    type: String,
-    ref: 'Product',
-    required: true
-  },
+const Cart = mongoose.model('Cart', cartSchema);
 
-  size: {
-    type: String,
-    required: true
-  },
-
-  color: {
-    type: String,
-    required: true
-  },
-
-  quantity: {
-    type: Number,
-    required: true,
-    min: 1
-  },
-
-  price: {
-    type: Number,
-    required: true
-  }
-},{ versionKey: false });
-
-module.exports = mongoose.model('Carts', shoppingCartSchema);
+module.exports = Cart;

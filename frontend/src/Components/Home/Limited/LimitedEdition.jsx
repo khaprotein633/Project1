@@ -122,7 +122,7 @@ const LimitedEdition = () => {
               },
             }}
           >
-            {StoreData.slice(8, 13).map((product) => {
+            {StoreData?.slice(8, 13).map((product) => {
               return (
                 <SwiperSlide key={product.productID}>
                   <div className="lpContainer">

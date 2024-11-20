@@ -177,10 +177,10 @@ export const getAllProducts = () => async (dispatch) => {
     });
 
     const { data } = await axios.get(`${server}/product/get`);
-    console.log('data', data);
+    // console.log('data', data);
     dispatch({
       type: "getAllProductsSuccess",
-      payload: data,
+      payload: data.products,
     });
   } catch (error) {
     dispatch({

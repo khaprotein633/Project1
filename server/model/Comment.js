@@ -5,13 +5,13 @@ const commentSchema = new mongoose.Schema({
   
  
   product_id: { 
-    type: String, 
+    type: mongoose.Schema.Types.ObjectId, 
     ref: 'Product', 
     required: true 
   },
  
   user_id: { 
-    type: String, 
+    type: mongoose.Schema.Types.ObjectId, 
     ref: 'User',
     required: true 
   },
