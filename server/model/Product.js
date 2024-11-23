@@ -1,25 +1,25 @@
 const mongoose = require('mongoose');
 
+const inventorySchema = new mongoose.Schema({
+  size: { type: String, required: true },
+  color: { type: String, required: true },
+  price: { type: Number, required: true },
+  quantity: { type: Number, required: true },
+  image_url: {type: String },
+  last_updated: { type: Date, default: Date.now }
+});
 
 const productSchema = new mongoose.Schema({
-  category_id: { type: String, ref: 'Category', required: true },
   product_name: { type: String, required: true },
-  brand_id: { type: String, ref: 'Brands', required: true },
-  price: { type: Number },
-  description: { type: String, default: '' },
-  detail: { type: String, default: '' },
+  category_id: { type: String, ref: 'Category', required: true },
+  brand_id: { type: String, ref: 'Brand', required: true },
+  description: { type: String },
+  detail: { type: String },
   main_image: { type: String },
-  images: [{ type: String }],
-  hide: { type: Boolean, default: false },
+  images: [{type:String}],
+  inventory: [inventorySchema] ,
   date_added: { type: Date, default: Date.now },
   date_updated: { type: Date, default: Date.now },
 }, { versionKey: false });
 
-productSchema.pre('save', function (next) {
-  this.date_updated = Date.now();
-  next();
-});
-
-const Products = mongoose.model('Product', productSchema);
-
-module.exports = Products;
+module.exports = mongoose.model('Product', productSchema);

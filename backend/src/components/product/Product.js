@@ -8,7 +8,7 @@ import CreateProduct from './CreateProduct';
 import ProductInfo from './ProductInfo';
 import { toast } from 'react-toastify';
 import UpdateProduct from './UpdateProduct';
-import Inventory from '../inventory/Inventory';
+import Inventory from './inventory/Inventory';
 
 const Product = () => {
     const [listProduct, setListProduct] = useState([]);
@@ -83,12 +83,6 @@ const Product = () => {
             key: 'detail',
         },
         {
-            title: 'Giá',
-            dataIndex: 'price',
-            key: 'price',
-            render: (price) => `${price} VND`,
-        },
-        {
             title: 'Action',
             key: 'action',
             render: (text, record) => (
@@ -117,6 +111,7 @@ const Product = () => {
                             onClick={() => {
                                 setProductId(record._id); 
                                 setEditInventory(true);  
+                                console.log("product",productId)
                             }}
                         />
                     </Tooltip>
