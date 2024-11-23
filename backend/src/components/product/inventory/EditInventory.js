@@ -14,7 +14,7 @@ const getBase64 = (file) =>
         reader.onerror = (error) => reject(error);
     });
 
-const EditInventory = ({ inventoryId, onSuccess }) => {
+const EditInventory = ({ productId,inventoryId, onSuccess }) => {
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
     const [sizes, setSizes] = useState([]);
@@ -27,8 +27,7 @@ const EditInventory = ({ inventoryId, onSuccess }) => {
     useEffect(() => {
         fetchSizes();
         fetchInventory();
-        console.log("id:", inventoryId);
-    }, [inventoryId]);
+    }, [productId,inventoryId]);
 
     const fetchSizes = () => {
         const sizeList = ['36', '37', '38', '39', '40', '41', '42', '43', '44', '45'];
@@ -37,7 +36,7 @@ const EditInventory = ({ inventoryId, onSuccess }) => {
 
     const fetchInventory = async () => {
         try {
-            const res = await axios.get(`http://localhost:4000/api/inventory/getbyid/${inventoryId}`);
+            const res = await axios.get(`http://localhost:4000/api/product/${productId}/inventory/get/${inventoryId}`);
             console.log('Inventory Data:', res.data.inventory);
             setInventoryData(res.data.inventory);
         } catch (err) {
@@ -71,7 +70,7 @@ const EditInventory = ({ inventoryId, onSuccess }) => {
             if (values.image_url && values.image_url[0]) {
                 formData.append('image_url', values.image_url[0].originFileObj);
             }
-            await axios.put(`http://localhost:4000/api/inventory/update/${inventoryId}`, formData, {
+            await axios.put(`http://localhost:4000/api/product/${productId}/inventory/update/${inventoryId}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
