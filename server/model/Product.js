@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Inventory = require('./Inventory');
 
 const inventorySchema = new mongoose.Schema({
   size: { type: String, required: true },

@@ -1,3 +1,4 @@
+const Cart = require('../model/Cart');
 const Order = require('../model/Order');
 
 const orderController = {
@@ -47,20 +48,54 @@ const orderController = {
   
     addOrder: async (req, res) => {
         try {
-            const newOrder = new Order(req.body);  
-            await newOrder.save();  
-            res.status(201).json(newOrder);
+            const { user_id, shipping_address, user_phone, payment_method, order_status_id, payment_status } = req.body;
+    
+            const cart = await Cart.findOne({ user_id: user_id });
+    
+            if (!cart || !cart.items.length) {
+                return res.status(400).json({ message: 'Giỏ hàng trống' });
+            }
+    
+            
+            const orderDetails = cart.items.map(item => ({
+                product_id: item.product_id,
+                size: item.size,
+                color: item.color,
+                quantity: item.quantity,
+                price: item.price,
+                product_image: item.product_image,
+                total_price: item.total_price
+            }));
+    
+            const totalAmount = cart.items.reduce((sum, item) => sum + item.total_price, 0);
+    
+            const newOrder = new Order({
+                user_id: user_id,
+                total_amount: totalAmount,
+                shipping_address: shipping_address,
+                user_phone: user_phone,
+                order_status_id: order_status_id,
+                payment_status: payment_status,
+                payment_method: payment_method,
+                order_details: orderDetails  
+            });
+    
+            await newOrder.save();
+
+            await Cart.deleteOne({ user_id: user_id });
+
+            res.status(201).json({newOrder});
         } catch (error) {
             console.error('Error adding order:', error);
             res.status(500).json({ message: 'Internal Server Error' });
         }
     },
-
+    
     // Cập nhật đơn hàng theo order_id
     updateOrder: async (req, res) => {
         try {
             const order = await Order.findOneAndUpdate(
-                { _id: req.params.order_id }, // Cập nhật theo _id
+                { _id: req.params._id }, // Cập nhật theo _id
                 req.body,
                 { new: true }  // Trả về đối tượng sau khi cập nhật
             );
@@ -84,84 +119,6 @@ const orderController = {
             res.status(204).send();  // Trả về 204 No Content sau khi xóa
         } catch (error) {
             console.error('Error deleting order:', error);
-            res.status(500).json({ message: 'Internal Server Error' });
-        }
-    },
-
-    // Lấy chi tiết các sản phẩm trong đơn hàng (order_details đã được nhúng trong Order)
-    getOrderDetailsByOrderId: async (req, res) => {
-        try {
-            const order = await Order.findOne({ _id: req.params.order_id });
-            if (!order) {
-                return res.status(404).json({ message: 'Order not found' });
-            }
-            res.status(200).json(order.order_details); // Trả về thông tin order_details của đơn hàng
-        } catch (error) {
-            console.error('Error fetching order details by order_id:', error);
-            res.status(500).json({ message: 'Internal Server Error' });
-        }
-    },
-
-    // Thêm chi tiết sản phẩm vào đơn hàng (order_details)
-    addOrderDetail: async (req, res) => {
-        try {
-            const order = await Order.findOne({ _id: req.params.order_id }); // Tìm đơn hàng theo order_id
-            if (!order) {
-                return res.status(404).json({ message: 'Order not found' });
-            }
-            
-            // Thêm chi tiết sản phẩm vào mảng order_details
-            order.order_details.push(req.body);
-            await order.save();  // Lưu đơn hàng đã cập nhật
-            res.status(201).json(order);  // Trả về đơn hàng đã được cập nhật
-        } catch (error) {
-            console.error('Error adding order detail:', error);
-            res.status(500).json({ message: 'Internal Server Error' });
-        }
-    },
-
-    // Cập nhật chi tiết sản phẩm trong đơn hàng
-    updateOrderDetail: async (req, res) => {
-        try {
-            const order = await Order.findOne({ _id: req.params.order_id }); // Tìm đơn hàng
-            if (!order) {
-                return res.status(404).json({ message: 'Order not found' });
-            }
-
-            const orderDetail = order.order_details.id(req.params.detail_id); // Tìm chi tiết sản phẩm trong mảng order_details
-            if (!orderDetail) {
-                return res.status(404).json({ message: 'Order detail not found' });
-            }
-
-            // Cập nhật thông tin chi tiết sản phẩm
-            Object.assign(orderDetail, req.body);
-            await order.save();  // Lưu lại đơn hàng đã cập nhật
-            res.status(200).json(orderDetail);  // Trả về chi tiết sản phẩm đã cập nhật
-        } catch (error) {
-            console.error('Error updating order detail:', error);
-            res.status(500).json({ message: 'Internal Server Error' });
-        }
-    },
-
-    // Xóa chi tiết sản phẩm trong đơn hàng
-    deleteOrderDetail: async (req, res) => {
-        try {
-            const order = await Order.findOne({ _id: req.params.order_id }); // Tìm đơn hàng
-            if (!order) {
-                return res.status(404).json({ message: 'Order not found' });
-            }
-
-            const orderDetail = order.order_details.id(req.params.detail_id); // Tìm chi tiết sản phẩm
-            if (!orderDetail) {
-                return res.status(404).json({ message: 'Order detail not found' });
-            }
-
-            // Xóa chi tiết sản phẩm khỏi mảng order_details
-            order.order_details.pull(orderDetail);
-            await order.save();  // Lưu lại đơn hàng đã cập nhật
-            res.status(204).send();  // Trả về 204 No Content sau khi xóa
-        } catch (error) {
-            console.error('Error deleting order detail:', error);
             res.status(500).json({ message: 'Internal Server Error' });
         }
     }

@@ -290,7 +290,6 @@ const productController = {
             // Sử dụng pull() để xóa inventory khỏi mảng
             product.inventory.pull(inventoryId);
     
-            // Lưu lại sản phẩm với inventory đã xóa
             await product.save();
     
             res.status(204).send(); // No content
