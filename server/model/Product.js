@@ -1,14 +1,15 @@
 const mongoose = require('mongoose');
 
- 
+
 const productSchema = new mongoose.Schema({
-  category_id: { type: String, ref: 'Category', required: true }, 
+  category_id: { type: String, ref: 'Category', required: true },
   product_name: { type: String, required: true },
   brand_id: { type: String, ref: 'Brands', required: true },
+  price: { type: Number },
   description: { type: String, default: '' },
   detail: { type: String, default: '' },
   main_image: { type: String },
-  images: [{ type: String }], 
+  images: [{ type: String }],
   hide: { type: Boolean, default: false },
   date_added: { type: Date, default: Date.now },
   date_updated: { type: Date, default: Date.now },

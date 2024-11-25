@@ -3,12 +3,8 @@ const Order = require('../model/Order');
 const orderController = {
     getAllOrders: async (req, res) => {
         try {
-            const page = parseInt(req.query.page) || 1; 
-            const size = parseInt(req.query.size) || 5; 
-            const skip = (page - 1) * size; 
-            const list = await Order.find({}).skip(skip).limit(size); 
-            const total = await Order.countDocuments();
-            res.status(200).json({list,total});
+            const orders = await Order.find(); 
+            res.status(200).json(orders);
         } catch (error) {
             console.error('Error fetching orders:', error);
             res.status(500).json({ message: 'Internal Server Error' });

@@ -37,16 +37,20 @@ const userController = {
         try {
             const existingUser = await User.findOne({ email: req.body.email });
             if (existingUser) {
-                return res.status(400).json({ message: 'Email đã tồn tại' });
+                return res.status(400).json({ message: 'Email đã tồn tại' ,success:false});
             }
-    
+
             const newUser = new User({
                 ...req.body
-            }); 
+            });
             await newUser.save();
-            res.status(201).json(newUser); 
+            res.status(201).json({
+                newUser,
+                success:true
+
+            });
         } catch (error) {
-            console.error('Error adding user:', error);a
+            console.error('Error adding user:', error);
             res.status(500).json({ message: 'Internal Server Error' });
         }
     },
@@ -55,9 +59,9 @@ const userController = {
     updateUser: async (req, res) => {
         try {
             const user = await User.findOneAndUpdate(
-                { _id: req.params._id }, 
-                req.body, 
-                { new: true } 
+                { _id: req.params._id },
+                req.body,
+                { new: true }
             );
             if (!user) {
                 return res.status(404).json({ message: 'User not found' });
@@ -81,7 +85,25 @@ const userController = {
             console.error('Error deleting user:', error);
             res.status(500).json({ message: 'Internal Server Error' });
         }
-    }
+    },
+    loginUser: async (req, res) => {
+        try {
+            const user = await User.findOne({ email: req.body.email }); // Tìm người dùng theo email
+            if (!user) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+
+            if (user.password !== req.body.password) {
+                return res.status(401).json({ message: 'Password is not matching' });
+            }
+
+            const { password, ...userWithoutPassword } = user.toObject();
+            res.status(200).json(userWithoutPassword);
+        } catch (error) {
+            console.error('Error fetching user:', error);
+            res.status(500).json({ message: 'Internal Server Error' });
+        }
+    },
 };
 
 module.exports = userController;
