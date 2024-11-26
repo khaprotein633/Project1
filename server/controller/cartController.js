@@ -29,7 +29,7 @@ const cartController = {
 
     addCartItem: async (req, res) => {
         try {
-            const { userId, productId, quantity } = req.body;
+            const { userId, productId, quantity,inventoryId } = req.body;
 
             let cart = await Cart.findOne({ userId });
             if (!cart) {
@@ -42,20 +42,13 @@ const cartController = {
             }
             console.log(product);
 
-            const productIndex = cart.items.findIndex(item => item.productId === productId);
+            const productIndex = cart.items.findIndex(item => item.inventoryId === inventoryId);
             if (productIndex > -1) {
                 cart.items[productIndex].quantity += quantity;
             } else {
-                cart.items.push({ productId, quantity });
+                cart.items.push({ productId, quantity ,inventoryId});
             }
 
-            // Calculate totalPrice with resolved promises
-            let totalPrice = 0;
-            for (const item of cart.items) {
-                const prod = await Products.findById(item.productId);
-                totalPrice += prod.price * item.quantity;
-            }
-            cart.totalPrice = totalPrice;
             await cart.save();
             res.send(cart);
         } catch (error) {

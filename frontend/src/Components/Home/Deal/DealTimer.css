@@ -4,13 +4,15 @@
 
   .dealTimer {
     background-color: #ebebeb;
-    background-image: url(../../../Assets/Deal/dealbg.jpg);
+    background-image: url(../../../Assets/images/banners/banner-4.jpg);
     height: 500px;
-    background-size: cover;
+    background-size: calc(100%);
     padding: 0 160px;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
+    background-position: center;
+    color: rgb(209, 209, 209);
   }
 
   .dealTimerMainContent {
@@ -62,7 +64,7 @@
   .dealTimeLink a {
     text-transform: uppercase;
     text-decoration: none;
-    color: black;
+    color: white;
     font-weight: 500;
     font-size: 14px;
     position: relative;
@@ -74,7 +76,7 @@
     left: 0;
     bottom: -5px;
     width: 50%;
-    border-bottom: 2px solid black;
+    border-bottom: 2px solid white;
     transition: width 0.2s ease;
   }
 

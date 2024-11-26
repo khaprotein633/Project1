@@ -89,31 +89,6 @@ const Navbar = () => {
     // fetchProductDetails();
   }, [dispatch, user]);
 
-  // useEffect(() => {
-  //   // const fetchProductDetails = async () => {
-  //   //   if (cart && cart[0] && cart[0].items) {
-  //   //     const items = cart[0].items.filter((item) => !loadedProductIds.has(item.productId));
-
-  //   //     if (items.length === 0) return; // Skip if all products are already loaded
-
-  //   //     try {
-  //   //       const promises = items.map((item) =>
-  //   //         axios.get(`${server}/product/get/${item.productId}`)
-  //   //       );
-
-  //   //       const responses = await Promise.all(promises);
-  //   //       const products = responses.map((response) => response.data);
-
-  //   //       setProductDetails(products);
-
-  //   //     } catch (error) {
-  //   //       console.error("Error fetching product details:", error);
-  //   //     }
-  //   //   }
-  //   // };
-
-  //   fetchProductDetails();
-  // }, [cart, loadedProductIds]);
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -131,7 +106,6 @@ const Navbar = () => {
         // Kết quả là một mảng chứa thông tin sản phẩm
         const products = responses.map((response) => response.data.product);
 
-        console.log("products", products);
         // Cập nhật danh sách sản phẩm
         setProductDetails(products);
       } catch (error) {
@@ -150,7 +124,6 @@ const Navbar = () => {
     }
 
   }, [cart, productDetails]);
-  console.log(productDetails);
 
   return (
     productDetails && <>
