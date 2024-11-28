@@ -15,7 +15,7 @@ const cartController = {
     // Lấy giỏ hàng theo user_id
     getCartByUserId: async (req, res) => {
         try {
-            const cart = await Cart.findOne({ user_id: req.params.user_id }); 
+            const cart = await Cart.findOne({ userId: req.params.userId }); 
             if (!cart) {
                 return res.status(404).json({ message: 'No cart found for this user' });
             }
@@ -29,7 +29,7 @@ const cartController = {
     // Thêm sản phẩm vào giỏ hàng
     addCartItem: async (req, res) => {
         try {
-            const { user_id, product_id, size, color, quantity, price, product_image } = req.body;
+            const { userId, productId, inventoryId , quantity } = req.body;
 
             // Kiểm tra số lượng hợp lệ
             if (quantity < 1) {
@@ -37,12 +37,12 @@ const cartController = {
             }
 
             // Tìm giỏ hàng của user
-            let cart = await Cart.findOne({ user_id });
+            let cart = await Cart.findOne({ userId });
 
             if (!cart) {
-                // Tạo giỏ hàng mới nếu chưa tồn tại
+                
                 cart = new Cart({
-                    user_id,
+                    userId,
                     items: []
                 });
             }
@@ -50,25 +50,19 @@ const cartController = {
             // Kiểm tra sản phẩm đã tồn tại trong giỏ hàng chưa
             const existingItem = cart.items.find(
                 (item) =>
-                    item.product_id === product_id &&
-                    item.size === size &&
-                    item.color === color
+                    item.productId === productId &&
+                    item.inventoryId == inventoryId
             );
 
             if (existingItem) {
                 // Cập nhật số lượng và giá
                 existingItem.quantity += quantity;
-                existingItem.total_price = existingItem.quantity * price;
             } else {
                 // Thêm sản phẩm mới vào mảng `items`
                 cart.items.push({
-                    product_id,
-                    size,
-                    color,
-                    quantity,
-                    price,
-                    product_image,
-                    total_price: quantity * price
+                    productId,
+                    inventoryId,
+                    quantity  
                 });
             }
 
@@ -83,15 +77,15 @@ const cartController = {
     // Cập nhật sản phẩm trong giỏ hàng
     updateCartItem: async (req, res) => {
         try {
-            const  userId  = req.params.user_id;
+
             const  cartitemId = req.params.cartitem_id;
-            const { quantity } = req.body;
+            const {  userId,quantity } = req.body;
 
             if (quantity < 1) {
                 return res.status(400).json({ message: 'Quantity must be at least 1' });
             }
 
-            const cart = await Cart.findOne({user_id: userId});
+            const cart = await Cart.findOne({userId: userId});
 
             if (!cart) {
                 return res.status(404).json({ message: 'Cart not found' });
@@ -102,10 +96,8 @@ const cartController = {
             if (!item) {
                 return res.status(404).json({ message: 'Cart item not found' });
             }
-            
-            const prices = item.price / item.quantity
             item.quantity = quantity;
-            item.price = item.quantity * prices; 
+            
             
             await cart.save();
 
@@ -117,12 +109,12 @@ const cartController = {
     },
 
    // Xóa sản phẩm khỏi giỏ hàng
-deleteCartItem: async (req, res) => {
+    deleteCartItem: async (req, res) => {
     try {
-        const userId = req.params.user_id;  
+        const userId = req.body.userId;  
         const cartItemId = req.params.cartitem_id; 
         
-        const cart = await Cart.findOne({ user_id: userId });
+        const cart = await Cart.findOne({ userId: userId });
 
         if (!cart) {
             return res.status(404).json({ message: 'Cart not found' });

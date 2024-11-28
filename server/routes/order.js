@@ -6,10 +6,10 @@ const orderController = require('../controller/orderController');
 router.get('/get', orderController.getAllOrders);
 
 
-router.get('/getby_id/:_id', orderController.getOrderById);
+router.get('/get/:_id', orderController.getOrderById);
 
 
-router.get('/getbyuser_id/:user_id', orderController.getOrdersByUserId);
+router.get('/get/:user_id', orderController.getOrdersByUserId);
 
 
 router.post('/add', orderController.addOrder);
