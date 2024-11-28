@@ -7,7 +7,7 @@ const upload = require('../config/upload');
 router.get('/get', productController.getAllProducts);
 
 // Get a product by product_id
-router.get('/get/:_id', productController.getProductById);
+router.get('/get/:product_id', productController.getProductById);
 
 // Get products by brand_id
 router.get('/brand/get/:brand_id', productController.getProductsByBrandId);

@@ -17,12 +17,14 @@ const Inventory = ({ product_id }) => {
   const [inventopryid, setinventopryid] = useState('');
 
   useEffect(() => {
+    setListInventory(null)
     fetchInventories(currentPage);
+    
   }, [product_id,currentPage]);
 
   const fetchInventories = async (page = currentPage) => {
     try {
-      const res = await axios.get(`http://localhost:4000/api/inventory/getbyproduct_id/${product_id}?page=${page}&size=${pageSize}`, {
+      const res = await axios.get(`http://localhost:4000/api/product/${product_id}/inventory/get`, {
         headers: {
           'Cache-Control': 'no-cache',
           'Pragma': 'no-cache',
@@ -38,7 +40,7 @@ const Inventory = ({ product_id }) => {
 
   const handleDelete = async (_id) => {
     try {
-      const res =  await axios.delete(`http://localhost:4000/api/inventory/delete/${_id}`);
+      const res =  await axios.delete(`http://localhost:4000/api/product/${product_id}/inventory/delete/${_id}`);
         fetchInventories(currentPage);
         toast.success("Xóa thành công!")
     } catch (error) {
@@ -155,7 +157,7 @@ const Inventory = ({ product_id }) => {
           setinventopryid('');
         }}
       >
-        <EditInventory inventoryId={inventopryid} onSuccess={() => {
+        <EditInventory productId = {product_id} inventoryId={inventopryid} onSuccess={() => {
           seteditform(false);
           setinventopryid('');
           fetchInventories();
@@ -173,7 +175,7 @@ const Inventory = ({ product_id }) => {
           setCreateInventory(false)
         }}
       >
-        <CreateInventory product_id={product_id} onSuccess={() => {
+        <CreateInventory productId={product_id} onSuccess={() => {
           setCreateInventory(false);
           fetchInventories();
         }} />

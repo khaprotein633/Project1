@@ -5,7 +5,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const CreateInventory = ({ product_id, onSuccess }) => {
+const CreateInventory = ({ productId, onSuccess }) => {
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
     const [sizes, setSizes] = useState([]); 
@@ -26,7 +26,6 @@ const CreateInventory = ({ product_id, onSuccess }) => {
         try {
             
             const formData = new FormData();
-            formData.append('product_id', product_id); 
             formData.append('size', values.size); 
             formData.append('color', values.color); 
             formData.append('quantity', values.quantity); 
@@ -38,7 +37,7 @@ const CreateInventory = ({ product_id, onSuccess }) => {
             }
 
             // Gửi request API tạo kho
-            await axios.post('http://localhost:4000/api/inventory/add', formData, {
+            await axios.post(`http://localhost:4000/api/product/${productId}/inventory/add`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
