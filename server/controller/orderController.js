@@ -91,32 +91,32 @@ const orderController = {
         }
     },
     
-    // Cập nhật đơn hàng theo order_id
+    
     updateOrder: async (req, res) => {
         try {
             const order = await Order.findOneAndUpdate(
-                { _id: req.params._id }, // Cập nhật theo _id
+                { _id: req.params._id }, 
                 req.body,
-                { new: true }  // Trả về đối tượng sau khi cập nhật
+                { new: true }  
             );
             if (!order) {
                 return res.status(404).json({ message: 'Order not found' });
             }
-            res.status(200).json(order);  // Trả về đơn hàng đã cập nhật
+            res.status(200).json(order);  
         } catch (error) {
             console.error('Error updating order:', error);
             res.status(500).json({ message: 'Internal Server Error' });
         }
     },
 
-    // Xóa đơn hàng theo order_id
+
     deleteOrder: async (req, res) => {
         try {
-            const order = await Order.findOneAndDelete({ _id: req.params.order_id }); // Xóa theo _id
+            const order = await Order.findOneAndDelete({ _id: req.params.order_id }); 
             if (!order) {
                 return res.status(404).json({ message: 'Order not found' });
             }
-            res.status(204).send();  // Trả về 204 No Content sau khi xóa
+            res.status(204).send();  
         } catch (error) {
             console.error('Error deleting order:', error);
             res.status(500).json({ message: 'Internal Server Error' });
