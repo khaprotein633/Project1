@@ -3,48 +3,78 @@ import Navbar from '../Components/Layout/Header/Navbar'
 import "./Cart.scss";
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
+import { getCartByUserId } from '../Redux/actions/cart';
+import { useNavigate } from 'react-router-dom';
 
 function Cart() {
     const [productDetails, setProductDetails] = useState([]);
+    const { allProducts } = useSelector((state) => state.product);
+    const { user, isAuthenticated } = useSelector((state) => state.user);
     const dispatch = useDispatch();
-    const {cart} = useSelector((state) => state.cart);
-    console.log('check cart',cart)
-    const [cartList,setCart] = useState([]);
-    const total = 422.99;
-    const salesTax = 45.89; 
-    useEffect(()=>{
-        setCart(cart);
-    },[cart])
+    const { cart } = useSelector((state) => state.cart);
+    const [totalPrice, setTotalPrice] = useState();
+    const navigate = useNavigate()
+    const salesTax = 45.89;
+
+    // Update cartList state only when cart is loaded and available
+    const [cartList, setCartList] = useState(cart || []);
+    const handleCheckout = () =>{
+        navigate("/checkout")
+    }
+    useEffect(() => {
+        if (user) {
+            // Fetch cart data if user is logged in
+            dispatch(getCartByUserId(user._id));
+        }
+    }, [user, dispatch]); // Only run when user changes or is authenticated
 
     useEffect(() => {
-        const fetchProductDetails = async () => {
-          if (!cart?.items) return; // Nếu cart hoặc cart.items không tồn tại, thoát khỏi hàm
-    
-          const items = cart.items; // Lấy danh sách items từ giỏ hàng
-          try {
-            // Gọi API cho từng productId
-            const promises = items.map((item) =>
-              axios.get(`http://localhost:4000/api/product/get/${item.productId}`)
-            );
-    
-            const responses = await Promise.all(promises);
-            console.log('all', responses);
-            // Kết quả là một mảng chứa thông tin sản phẩm
-            const products = responses.map((response) => response.data.product);
-    
-            console.log("products", products);
-            // Cập nhật danh sách sản phẩm
-            setProductDetails(products);
-          } catch (error) {
-            console.error("Error fetching product details:", error);
-          }
-        };
-    
-        fetchProductDetails();
-      }, [cart, dispatch]);
-      console.log('product', productDetails)
+        // Only update cartList when cart data is available
+        if (cart?.items) {
+            setCartList(cart);
+        }
+    }, [cart]); // Run only when cart is updated
+
+    useEffect(() => {
+        if (cartList?.items && allProducts.length > 0) {
+            const cartProducts = cartList.items.map((cartItem) => {
+                const product = allProducts.find((p) => p._id === cartItem.productId);
+                const inventory = product.inventory.find((i) => i._id === cartItem.inventoryId);
+
+                return {
+                    _id: product._id,
+                    inventoryId: inventory._id,
+                    size: inventory.size,
+                    color: inventory.color,
+                    price: inventory.price,
+                    quantity: cartItem.quantity,
+                    category_id: product.category_id,
+                    product_name: product.product_name,
+                    brand_id: product.brand_id,
+                    description: product.description,
+                    detail: product.detail,
+                    main_image: product.main_image,
+                    images: product.images,
+                    hide: product.hide,
+                    date_added: product.date_added,
+                    date_updated: product.date_updated,
+                };
+            });
+            setProductDetails(cartProducts);
+            const totalPrice = productDetails.reduce((total, product) => {
+                return total + (product.price * product.quantity);
+            }, 0)
+            setTotalPrice(totalPrice);
+        }
+    }, [cartList, allProducts]); // Only run when cartList or allProducts change
+
+    // Loading state if cart or product details are missing
+    if (!cart || !cart.items || productDetails.length === 0) {
+        return <div>Loading cart...</div>;
+    }
+
     return (
-       productDetails&&  <>
+        cart && <>
             <Navbar />
             <div className="cart-page">
                 {/* Breadcrumb */}
@@ -66,10 +96,16 @@ function Cart() {
                                     <div className="details">
                                         <h5>{item?.product_name}</h5>
                                         <p>
-                                            SIZE: {item?.inventory[0]?.size} / QTY: {item?.inventory[0]?.quantity}
+                                            SIZE: {item?.size} / DESIGN: {item?.color}
                                         </p>
                                     </div>
-                                    <div className="price">$ {item?.inventory[0]?.price}</div>
+                                    <div className="price">
+                                        {parseInt(item?.price).toLocaleString("vi-VN", {
+                                            style: "currency",
+                                            currency: "VND",
+                                        })} x {item.quantity}
+
+                                    </div>
                                     <button className="remove-btn">&times;</button>
                                 </div>
                             ))}
@@ -80,17 +116,25 @@ function Cart() {
                     <div className="cart-right">
                         <h4>Grand Total</h4>
                         <p>Inc ${salesTax.toFixed(2)} sales tax</p>
-                        <h2>${total.toFixed(2)}</h2>
+                        <h2>  {parseInt(totalPrice).toLocaleString("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                        })}</h2>
                         <div className="coupon">
                             <input type="text" placeholder="Enter coupon code" />
                             <button>Apply</button>
                         </div>
-                        <button className="checkout-btn">Proceed to checkout</button>
+                        <button onClick={handleCheckout} className="checkout-btn">Proceed to checkout</button>
                     </div>
                 </div>
             </div>
+
+
+
+
         </>
     )
 }
 
 export default Cart
+

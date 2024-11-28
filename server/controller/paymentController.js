@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const catchAsyncErrors = require("../middleware/catchAsyncError");
-
+const dotenv = require('dotenv');
+dotenv.config();
 const stripe = require('stripe')('sk_test_51PYKQtKvZ8GzQADcyjUg0RpQOM5MsxqM9jBjTzML6Yh7qeLUiOKbscvnjbTWQzgLI2EHlBnMSGe4nVmsSPvdriFW00KvZRCH83');
 router.post(
   "/process",

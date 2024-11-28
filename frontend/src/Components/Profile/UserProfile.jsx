@@ -20,7 +20,7 @@ function UserProfile({ userProps }) {
     }
 
 
-    console.log('â', userProps);
+    // console.log('â', userProps);
     const handleUpdateProfile = () => {
         setIsSaving(true);
         // Simulate an API call

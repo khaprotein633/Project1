@@ -16,18 +16,41 @@ import { useSelector } from "react-redux";
 import Cart from "./Pages/Cart.jsx";
 import CheckoutPage from "./Pages/CheckoutPage/CheckoutPage.jsx";
 import ProductDetailPage from "./Pages/ProductDetailPage/ProductDetailPage.jsx";
-
+import PaymentPage from "./Pages/PaymentPage/PaymentPage.jsx";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+import axios from "axios";
+import { server } from "./Config/server.js";
+import OrderSuccessPage from "./Pages/OrderSuccess/OrderSuccessPage.jsx";
 
 function App() {
+  const [stripeApikey, setStripeApiKey] = useState("");
 
+  async function getStripeApikey() {
+    const { data } = await axios.get(`${server}/payment/stripeapikey`);
+    console.log("data", data);
+    setStripeApiKey(data.stripeApikey);
+  }
   useEffect(() => {
     // Store.dispatch(loadUser());
     Store.dispatch(getAllProducts());
+    getStripeApikey();
 
   }, []);
   return (
     <BrowserRouter>
-
+     {stripeApikey && (
+        <Elements stripe={loadStripe(stripeApikey)}>
+          <Routes>
+            <Route
+              path="/payment"
+              element={
+                  <PaymentPage />
+              }
+            />
+          </Routes>
+        </Elements>
+      )}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Authentication />} />
@@ -37,6 +60,7 @@ function App() {
 
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/order/success" element={<OrderSuccessPage />} />
 
       </Routes>
 

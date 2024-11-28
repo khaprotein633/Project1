@@ -14,7 +14,7 @@ import { getAllProducts } from "../Redux/actions/product";
 const Home = () => {
   const { allProducts } = useSelector((state) => state.product);
   const {user} = useSelector((state)=> state)
-  console.log("user in nav",user);
+  // console.log("user in nav",user);
   // console.log(allProducts)
 
     return (

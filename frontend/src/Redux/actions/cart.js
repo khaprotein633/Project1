@@ -1,9 +1,9 @@
 import axios from "axios";
 import { server } from "../../Config/server";
-// create product
-export const createProduct =
+// add cart 
+export const AddCart =
   (
-    productId,userId,quantity
+    cartItem
   ) =>
   async (dispatch) => {
     try {
@@ -13,9 +13,9 @@ export const createProduct =
       // const config = {headers :{"Content-Type":"multipart/form-data"}};
 
       // const {data }= await axios.post(`${server }/product/create-product`,newForm, config);
-      const { data } = await axios.post(
-        `${server}/cart/add-cart`,
-        productId,userId,quantity
+      const data  = await axios.post(
+        `${server}/cart/add `,
+        cartItem
       );
       dispatch({
         type: "cartCreateSuccess",

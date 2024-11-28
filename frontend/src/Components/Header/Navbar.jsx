@@ -26,7 +26,7 @@ import { logoutUser } from "../../Redux/actions/user";
 
 const Navbar = () => {
   const {user} = useSelector((state)=> state.user)
-  console.log("user in nav",user);
+  // console.log("user in nav",user);
   const cart = []
   const dispatch = useDispatch();
 

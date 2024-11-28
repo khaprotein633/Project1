@@ -102,7 +102,7 @@ const Navbar = () => {
         );
 
         const responses = await Promise.all(promises);
-        console.log('all', responses);
+        // console.log('all', responses);
         // Kết quả là một mảng chứa thông tin sản phẩm
         const products = responses.map((response) => response.data.product);
 

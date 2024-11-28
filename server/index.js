@@ -54,6 +54,9 @@ app.use('/api/OS', OSRoute);
 const WLRoute = require('./routes/withlist');
 app.use('/api/WL', WLRoute);
 
+const payment = require("./controller/paymentController");
+app.use("/api/payment/", payment);
+
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.listen(4000, () => {

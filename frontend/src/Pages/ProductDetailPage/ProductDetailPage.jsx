@@ -6,36 +6,97 @@ import { useDispatch, useSelector } from "react-redux";
 import { getOneProductById } from "../../Redux/actions/product";
 import RecommendationAndReviews from "./RecommendationAndReview";
 import ReviewComponent from "./Review";
+import { AddCart } from "../../Redux/actions/cart";
+import { toast } from "react-toastify";
 
 const ProductDetailPage = () => {
-  const [selectedSize, setSelectedSize] = useState("M");
-  const [selectedDesign, setSelectedDesign] = useState(0);
-  const { product } = useSelector((state) => state.product)
+  const [selectedSize, setSelectedSize] = useState(null);
+  const [selectedColor, setSelectedColor] = useState(null);
+  const [filteredInventory, setFilteredInventory] = useState();
+  const {user} = useSelector((state)=>state.user)
+  const {cart,success,error,isLoading} = useSelector((state)=>state.cart)
+
+  const { product } = useSelector((state) => state.product);
   const dispatch = useDispatch();
   const { id } = useParams();
+  const [sizes, setSizes] = useState([]);
+  const [colors, setColors] = useState([]);
   const [activeSection, setActiveSection] = useState(null);
+  useEffect(() => {
+    dispatch(getOneProductById(id));
+  }, [dispatch, id]);
+  const [selectedDesign, setSelectedDesign] = useState("");
+  useEffect(() => {
+    if (product?.inventory) {
+      const uniqueSizes = [...new Set(product.inventory.map(item => item.size))];
+      setSizes(uniqueSizes);
 
+      // Initialize with all inventory and colors when no size is selected
+      setFilteredInventory(product.inventory);
+      setColors([...new Set(product.inventory.map(item => item.color))]);
+    }
+  }, [product]);
   const toggleSection = (section) => {
     setActiveSection(activeSection === section ? null : section);
   };
-  console.log('id', id)
-  useEffect(() => {
-    dispatch(getOneProductById(id))
-  }, [])
+  const handleSizeClick = (size) => {
+    setSelectedSize(size);
 
-  console.log(product);
-  // const product = {
-  //   name: "Kiikii Osaka Japan Mens T-Shirt Limited Edition",
-  //   price: 34.99,
-  //   sizes: ["S", "M", "L", "XL", "XXL"],
-  //   designs: [
-  //     { id: 0, image: "/images/design1.jpg" },
-  //     { id: 1, image: "/images/design2.jpg" },
-  //   ],
-  //   description: "High-quality cotton T-shirt with a sleek design inspired by Osaka, Japan.",
-  // };
+    // Filter inventory for the selected size
+    const filtered = product.inventory.filter(item => item.size === size);
+    setFilteredInventory(filtered);
+
+    // Update available colors based on filtered inventory
+    const uniqueColors = [...new Set(filtered.map(item => item.color))];
+    setColors(uniqueColors);
+    setSelectedColor(null); // Reset selected color when size changes
+    // console.log('size',size);
+    
+  };
+
+  const handleColorClick = (color) => {
+    setSelectedColor(color);
+    // console.log('color',color);
+    // Optionally, filter further based on color if required
+    // Example: setFilteredInventory(filteredInventory.filter(item => item.color === color));
+    filterInventory(selectedSize, color);
+
+  };
+  const filterInventory = (size, color) => {
+    // If both size and color are selected, filter by both
+    let filtered = product.inventory;
+    if (size) {
+      filtered = filtered.filter(item => item.size === size);
+    }
+    if (color) {
+      filtered = filtered.filter(item => item.color === color);
+    }
+    console.log('filter',filtered[0])
+    setFilteredInventory(filtered[0]);
+  };
+  const handleAddToCart = () =>{
+    const cartItem = {
+      userId: user._id,
+      productId : product._id,
+      quantity:1,
+      inventoryId:filteredInventory._id,
+    };
+    if(!selectedColor ||  !selectedSize || !filteredInventory ){
+      toast.error(`Please choose a product`);
+      return;
+    }
+    try {
+      dispatch(AddCart(cartItem))
+      toast.success(`Add product ${product?.product_name} to cart successfully`)
+    } catch (error) {
+      toast.error(`Something went error!`)
+
+    }
+
+  }
 
   return (
+    sizes &&
     <>
       <Navbar />
       <div className="product-page">
@@ -52,18 +113,22 @@ const ProductDetailPage = () => {
           {/* Right Section */}
           <div className="product-page__details">
             <h1 className="product-name">{product?.product_name}</h1>
-            <p className="product-price">${product?.inventory[0].price.toFixed(2)}</p>
+            <p className="product-price">
+                {parseInt(product?.inventory[0]?.price).toLocaleString("vi-VN", {
+                  style: "currency",
+                  currency: "VND",
+                })}
+            </p>
 
             <div className="product-sizes">
               <p>AVAILABLE SIZES:</p>
               <div className="sizes">
-                {["39", "40", "41", "42", "43"].map((size) => (
+                {sizes?.map((size) => (
                   <button
                     key={size}
                     className={`size-button ${selectedSize === size ? "active" : ""
                       }`}
-                    onClick={() => setSelectedSize(size)}
-                  >
+                    onClick={() => handleSizeClick(size)}                  >
                     {size}
                   </button>
                 ))}
@@ -73,21 +138,20 @@ const ProductDetailPage = () => {
             <div className="product-designs">
               <p>AVAILABLE DESIGNS:</p>
               <div className="designs">
-                {/* {product?.designs.map((design) => (
-                <img
-                  key={design?.id}
-                  src={design?.image}
-                  alt={`Design ${design?.id}`}
-                  className={`design-image ${
-                    selectedDesign === design.id ? "active" : ""
-                  }`}
-                  onClick={() => setSelectedDesign(design?.id)}
-                />
-              ))} */}
+                {colors?.map((color) => (
+                  <button
+                    key={color}
+                    className={`designs-button ${selectedColor === color ? "active" : ""
+                      }`}
+                      onClick={() => handleColorClick(color)}
+                  >
+                    {color}
+                  </button>
+                ))}
               </div>
             </div>
 
-            <button className="add-to-cart-button">Add To Shopping Bag</button>
+            <button onClick={handleAddToCart} className="add-to-cart-button">Add To Shopping Bag</button>
 
             <div className="product-icons">
               <div>
@@ -162,8 +226,8 @@ const ProductDetailPage = () => {
           </div>
         </div>
       </div>
-      <RecommendationAndReviews/>
-      <ReviewComponent/>
+      <RecommendationAndReviews />
+      <ReviewComponent />
     </>
   );
 };
