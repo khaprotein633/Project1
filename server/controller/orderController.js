@@ -3,7 +3,6 @@ const Order = require('../model/Order');
 const Product = require('../model/Product');
 
 const orderController = {
-
     getAllOrders: async (req, res) => {
         try {
             const page = parseInt(req.query.page) || 1;
@@ -18,6 +17,7 @@ const orderController = {
         }
     },
 
+    
     getOrderById: async (req, res) => {
         try {
             const order = await Order.findOne({ _id: req.params.order_id });
@@ -111,7 +111,7 @@ const orderController = {
             if (!order) {
                 return res.status(404).json({ message: 'Order not found' });
             }
-            res.status(200).json(order);
+            res.status(200).json(order);  
         } catch (error) {
             console.error('Error updating order:', error);
             res.status(500).json({ message: 'Internal Server Error' });

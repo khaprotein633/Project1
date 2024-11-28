@@ -1,12 +1,12 @@
 const Category = require('../model/Category');
 
 const categoryController = {
-    
+    // Get all categories
     getAllCategories: async (req, res) => {
         try {
-            const page = parseInt(req.query.page) || 1; 
-            const size = parseInt(req.query.size) || 5; 
-            const skip = (page - 1) * size; 
+            const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là 1
+            const size = parseInt(req.query.size) || 5; // Số mục trên mỗi trang, mặc định là 5
+            const skip = (page - 1) * size; // Số mục cần bỏ qua
 
             const list = await Category.find({}).skip(skip).limit(size); 
             const total = await Category.countDocuments();

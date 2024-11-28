@@ -1,10 +1,11 @@
 const Cart = require('../model/Cart');
+const Products = require('../model/Product');
 
 const cartController = {
     // Lấy tất cả giỏ hàng
     getAllCarts: async (req, res) => {
         try {
-            const carts = await Cart.find(); 
+            const carts = await Cart.find();
             res.status(200).json(carts);
         } catch (error) {
             console.error('Error fetching carts:', error);
