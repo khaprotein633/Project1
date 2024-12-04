@@ -72,7 +72,18 @@ const PaymentPage = () => {
     const handleBillingCheckboxChange = (event) => {
         setUseBillingAddress(event.target.checked);
     };
-
+    const order = {
+        // cart: orderData?.cart,
+        // shippingAddress: orderData?.shippingAddress,
+        // user: user && user,
+        // totalPrice: orderData?.totalPrice,
+        user_id: user?._id,
+        total_amount: totalPrice,
+        shipping_address: `${orderData?.address}, ${orderData?.state}, ${orderData?.country}`,
+        user_phone: orderData?.phoneNumber,
+        order_status: "Pending",
+        payment_method: paymentMethod,
+    };
     const paymentData = {
         amount: Math.round(totalPrice),
     };
@@ -93,9 +104,9 @@ const PaymentPage = () => {
                 );
 
                 const client_secret = data.client_secret;
-                console.log('client', client_secret);
-                console.log('stripe', stripe);
-                console.log('elements', elements);
+                // console.log('client', client_secret);
+                // console.log('stripe', stripe);
+                // console.log('elements', elements);
 
                 if (!stripe || !elements) return;
                 const result = await stripe.confirmCardPayment(client_secret, {
@@ -114,18 +125,17 @@ const PaymentPage = () => {
                         //     status: result.paymentIntent.status,
                         //     type: "Credit Card",
                         // };
+                        console.log('order',order);
 
-                        // await axios
-                        //     .post(`${server}/order/create-order`, order, config)
-                        //     .then((res) => {
-                        //         setOpen(false);
-                        //         navigate("/order/success");
-                        //         toast.success("Order successful!");
-                        //         localStorage.setItem("cartItems", JSON.stringify([]));
-                        //         localStorage.setItem("latestOrder", JSON.stringify([]));
-                        //         window.location.reload();
-                        //     });
-                        toast.success("order successfully")
+                        await axios
+                            .post(`${server}/order/add`, order, config)
+                            .then((res) => {
+                                navigate("/order/success");
+                                toast.success("Order successful!");
+                                localStorage.setItem("userOrderData", JSON.stringify([]));
+                                localStorage.setItem("latestOrder", JSON.stringify([]));
+                                window.location.reload();
+                            });
                     }
                 }
             } catch (error) {
@@ -234,6 +244,16 @@ const PaymentPage = () => {
                                     </td>
 
                                 </tr>
+                                <tr>
+                                    <td className="label">Phone Number</td>
+                                    <td className="value">{orderData.phoneNumber}</td>
+                                    <td className="label action">
+                                        <button>
+                                            Change
+                                        </button>
+                                    </td>
+                                </tr>
+
                                 <tr>
                                     <td className="label">Address</td>
                                     <td className="value">{orderData.address}, {orderData.state}, {orderData.country}</td>

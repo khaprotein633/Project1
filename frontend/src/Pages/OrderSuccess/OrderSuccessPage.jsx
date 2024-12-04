@@ -1,7 +1,7 @@
 import React from "react";
 import Lottie from "react-lottie";
 import animationData from "../../Assets/animations/success.json";
-
+import "./OrderSuccessPage.scss";
 const OrderSuccessPage = () => {
     return (
         <div>
@@ -22,9 +22,9 @@ const Success = () => {
         },
     };
     return (
-        <div>
+        <div className="order-container">
             <Lottie options={defaultOptions} width={300} height={300} />
-            <h5 class="order-success">
+            <h5 className="order-success">
                 Your order is successful 😍
             </h5>
             <br />

@@ -10,6 +10,8 @@ const CheckoutPage = () => {
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState("");
+
     const [newsletter, setNewsletter] = useState(false);
 
     // State for shipping address form
@@ -50,6 +52,7 @@ const CheckoutPage = () => {
                 firstName: firstName,
                 lastName: lastName,
                 email: email,
+                phoneNumber: phoneNumber,
                 newsletter: newsletter,
                 address:address,
                 country: country,
@@ -80,7 +83,7 @@ const CheckoutPage = () => {
     }, [cart]); // Run only when cart is updated
 
     useEffect(() => {
-        if (cartList?.items && allProducts.length > 0) {
+        if (cartList?.items && allProducts?.length > 0) {
             const cartProducts = cartList.items.map((cartItem) => {
                 const product = allProducts.find((p) => p._id === cartItem.productId);
                 const inventory = product.inventory.find((i) => i._id === cartItem.inventoryId);
@@ -160,6 +163,15 @@ const CheckoutPage = () => {
                                     placeholder="you@example.com"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
+                                />
+                            </div>
+                            <div className="input-group">
+                                <div>Phone Number</div>
+                                <input
+                                    type="phoneNumber"
+                                    placeholder="097789789"
+                                    value={phoneNumber}
+                                    onChange={(e) => setPhoneNumber(e.target.value)}
                                 />
                             </div>
                         </div>
@@ -264,7 +276,7 @@ const CheckoutPage = () => {
                     <div className="summary">
                         <p>Subtotal:
 
-                            {formatCurrency(totalPrice + salesTax)} 
+                            {formatCurrency(totalPrice)} 
 
 
                         </p>
@@ -273,7 +285,7 @@ const CheckoutPage = () => {
 
                         </p>
                         <p className="total">Grand Total:                             
-                        {formatCurrency(totalPrice + salesTax + 8.95)} 
+                        {formatCurrency(totalPrice + 30000)} 
 
                         </p>
                     </div>

@@ -1,6 +1,16 @@
-.order-success {
-    text-align: center;
-    margin-bottom: 3.5rem; // chuyển từ `mb-14` (14 * 0.25rem)
-    font-size: 25px;
-    color: rgba(0, 0, 0, 0.63); // chuyển từ `text-[#000000a1]`
+.order-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  height: 100vh; /* Full height of the viewport */
+  text-align: center; /* Center the text inside the <h5> */
+  .order-success {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center; /* Remove default margins for better centering */
   }
+}
+
