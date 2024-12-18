@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const wishlistController = require('../controller/withlistController');
+const wishlistController = require('../controller/wishlistController');
 
 // Lấy tất cả danh sách yêu thích
 router.get('/get', wishlistController.getAllWishLists);

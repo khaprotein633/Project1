@@ -42,13 +42,21 @@ const orderRoute = require('./routes/order');
 app.use('/api/order',orderRoute);
 
 const ODRoute = require('./routes/OD');
-app.use('/api/OD',ODRoute);
+app.use('/api/orderdetail',ODRoute);
 
 const OSRoute = require('./routes/OS');
-app.use('/api/OS',OSRoute);
+app.use('/api/orderstatus',OSRoute);
 
-const WLRoute = require('./routes/withlist');
-app.use('/api/WL',WLRoute);
+const WLRoute = require('./routes/wishlist');
+app.use('/api/wishlist',WLRoute);
+
+const CommentRoute = require('./routes/comment');
+app.use('/api/comment',CommentRoute);
+
+
+const DiscountRoute = require('./routes/discount');
+app.use('/api/discount',DiscountRoute);
+
 
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

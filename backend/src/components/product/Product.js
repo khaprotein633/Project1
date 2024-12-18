@@ -111,7 +111,6 @@ const Product = () => {
                             onClick={() => {
                                 setProductId(record._id); 
                                 setEditInventory(true);  
-                                console.log("product",productId)
                             }}
                         />
                     </Tooltip>

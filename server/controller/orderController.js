@@ -11,7 +11,7 @@ const orderController = {
             const skip = (page - 1) * size;
             const list = await Order.find({}).skip(skip).limit(size);
             const total = await Order.countDocuments();
-            res.status(200).json({ list, total });
+            res.status(200).json({ list, total});
         } catch (error) {
             console.error('Error fetching orders:', error);
             res.status(500).json({ message: 'Internal Server Error' });
@@ -20,11 +20,11 @@ const orderController = {
 
     getOrderById: async (req, res) => {
         try {
-            const order = await Order.findOne({ _id: req.params.order_id });
+            const order = await Order.findOne({ _id: req.params._id });
             if (!order) {
                 return res.status(404).json({ message: 'Order not found' });
             }
-            res.status(200).json(order);
+            res.status(200).json({order});
         } catch (error) {
             console.error('Error fetching order:', error);
             res.status(500).json({ message: 'Internal Server Error' });

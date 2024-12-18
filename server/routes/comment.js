@@ -6,7 +6,7 @@ const commentController = require('../controller/commentController');
 router.get('/get', commentController.getAllComments);
 
 // Route để lấy các nhận xét theo product_id
-router.get('/get/:_id', commentController.getCommentsByProductId);
+router.get('/get/:product_id', commentController.getCommentsByProductId);
 
 // Route để thêm mới một nhận xét
 router.post('/add', commentController.addComment);
