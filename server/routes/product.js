@@ -28,16 +28,16 @@ router.put('/update/:product_id', upload.fields([{ name: 'main_image', maxCount:
 router.delete('/delete/:product_id', productController.deleteProduct);
 
 // Get inventory for a specific product with pagination
-router.get('/inventory/get', productController.getInventoryByProductId);
-router.get('/inventory/get/:inventory_id', productController.getInventoryById);
+router.get('/:product_id/inventory/get', productController.getInventoryByProductId);
+router.get('/:product_id/inventory/get/:inventory_id', productController.getInventoryById);
 
 // Add new inventory for a product
-router.post('/inventory/add', upload.single('image_url'), productController.addInventory);
+router.post('/:product_id/inventory/add', upload.single('image_url'), productController.addInventory);
 
 // Update an inventory item by inventory_id
-router.put('/inventory/update/:inventory_id', upload.single('image_url'), productController.updateInventory);
+router.put('/:product_id/inventory/update/:inventory_id', upload.single('image_url'), productController.updateInventory);
 
 // Delete an inventory item by inventory_id
-router.delete('/inventory/delete/:inventory_id', productController.deleteInventory);
+router.delete('/:product_id/inventory/delete/:inventory_id', productController.deleteInventory);
 
 module.exports = router;

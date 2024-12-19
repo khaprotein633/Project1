@@ -8,7 +8,7 @@ import CreateProduct from './CreateProduct';
 import ProductInfo from './ProductInfo';
 import { toast } from 'react-toastify';
 import UpdateProduct from './UpdateProduct';
-import Inventory from './inventory/Inventory';
+import Inventory from '../inventory/Inventory';
 
 const Product = () => {
     const [listProduct, setListProduct] = useState([]);

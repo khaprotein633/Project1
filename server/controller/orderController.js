@@ -104,21 +104,31 @@ const orderController = {
 
     updateOrder: async (req, res) => {
         try {
+            const { order_status } = req.body;
+
+            // Check if the order status is "Đang giao" to update the delivery date
+            let updateFields = { ...req.body };
+
+            if (order_status === 'Đang giao') {
+                updateFields.delivery_date = new Date(); // Set delivery date to current date
+            }
+
             const order = await Order.findOneAndUpdate(
                 { _id: req.params._id },
-                req.body,
+                updateFields,
                 { new: true }
             );
+
             if (!order) {
                 return res.status(404).json({ message: 'Order not found' });
             }
+
             res.status(200).json(order);
         } catch (error) {
             console.error('Error updating order:', error);
             res.status(500).json({ message: 'Internal Server Error' });
         }
     },
-
     deleteOrder: async (req, res) => {
         try {
             const order = await Order.findOneAndDelete({ _id: req.params._id });
