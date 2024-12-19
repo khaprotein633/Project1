@@ -86,7 +86,8 @@ const orderController = {
                 user_phone: user_phone,
                 order_status: order_status,
                 payment_method: payment_method,
-                order_details: orderDetails
+                order_details: orderDetails,
+                delivery_date: null
             });
            
             await newOrder.save();
