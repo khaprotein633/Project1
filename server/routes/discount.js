@@ -4,6 +4,8 @@ const router = express.Router();
 
 
 router.get('/get', discountController.getAllDiscounts);
+
+router.get('/get/:_id', discountController.getDiscountById);
 router.post('/add',discountController.createDiscount);
 router.put('/update/:_id',discountController.updateDiscount);
 router.delete('/delete/:_id', discountController.deleteDiscount);

@@ -11,7 +11,6 @@ const discountController = {
             const discounts = await Discount.find({})
                 .skip(skip)
                 .limit(size)
-                .sort({ start_date: -1 }); // Sắp xếp giảm giá theo ngày bắt đầu (mới nhất trước)
 
             const total = await Discount.countDocuments();
 
@@ -25,7 +24,7 @@ const discountController = {
     // Lấy thông tin chi tiết của một discount
     getDiscountById: async (req, res) => {
         try {
-            const discount = await Discount.findById(req.params.id);
+            const discount = await Discount.findById(req.params._id);
             if (!discount) {
                 return res.status(404).json({ message: 'Discount not found' });
             }
@@ -40,6 +39,10 @@ const discountController = {
     createDiscount: async (req, res) => {
         try {
             const { discount_name, discount_percentage, start_date, end_date } = req.body;
+
+            if (new Date(start_date) > new Date(end_date)) {
+                return res.status(400).json({ message: 'Start date cannot be later than end date' });
+            }
 
             // Tạo discount mới
             const newDiscount = new Discount({
