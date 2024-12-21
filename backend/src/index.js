@@ -17,6 +17,8 @@ import User from './components/user/User';
 import Product from './components/product/Product';
 import Category from './components/category/Category';
 import Order from './components/order/Order';
+import Comments from './components/comment/Comments';
+import Discount from './components/discount/Discount';
 
 const router = createBrowserRouter([
   {
@@ -51,6 +53,14 @@ const router = createBrowserRouter([
       {
         path: "category",
         element: <Category/>
+      },
+      {
+        path: "comments",
+        element: <Comments/>
+      },
+      {
+        path: "discount",
+        element: <Discount/>
       },
       {
         path: "report",
