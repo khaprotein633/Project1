@@ -1,25 +1,26 @@
-const Brands = require('../model/Brands');
+const Brands = require('../model/Brand');
 
 const brandController = {
     // Retrieve all brands
     getAllBrands: async (req, res) => {
         try {
             const page = parseInt(req.query.page) || 1;
-            const size = parseInt(req.query.size) || 5; 
-            const skip = (page - 1) * size; 
-    
+            const size = parseInt(req.query.size) || 5;
+            const skip = (page - 1) * size;
+
             const listBrand = await Brands.find({})
                 .skip(skip)
-                .limit(size); 
-    
-            const total = await Brands.countDocuments(); 
-    
+                .limit(size);
+
+            const total = await Brands.countDocuments();
+
             res.status(200).json({ brands: listBrand, total });
         } catch (error) {
             res.status(500).json({ message: 'Error fetching brands', error: error.message });
         }
     }
-    , getAll: async (req, res) => {
+    ,
+     getAll: async (req, res) => {
         try {
             const listBrand = await Brands.find({})
             res.status(200).json({ listBrand });
@@ -28,46 +29,44 @@ const brandController = {
         }
     }
     ,
-    
-    
-
-     getBrandById: async (req, res) => {
+    getBrandById: async (req, res) => {
         try {
-            const brand = await Brands.findOne({ _id: req.params._id });
+            const brand= await Brands.findById(req.params._id); 
             if (!brand) {
                 return res.status(404).json({ message: 'Brand not found' });
             }
-            res.status(200).json(brand);
+            res.status(200).json({ brand });
         } catch (error) {
             res.status(500).json({ message: 'Error fetching brand', error: error.message });
         }
     },
     
-     getBrandByName: async (req, res) => {
+
+    getBrandByName: async (req, res) => {
         try {
-            const brand = await Brands.find({ 
+            const brand = await Brands.find({
                 brand_name: { $regex: req.params.brand_name, $options: 'i' }
             });
             if (!brand) {
                 return res.status(404).json({ message: 'Brand not found' });
             }
-            res.status(200).json(brand);
+            res.status(200).json({brand});
         } catch (error) {
             res.status(500).json({ message: 'Error fetching brand', error: error.message });
         }
     },
 
-   
-    addBrand: async (req, res) => {  
+
+    addBrand: async (req, res) => {
         try {
-           
-            const {brand_name} = req.body;
+
+            const { brand_name } = req.body;
             const logoUrl = req.file ? `http://localhost:4000/${req.file.path.replace(/\\/g, '/')}` : '';
-            const existingBrand = await Brands.findOne({brand_name});
+            const existingBrand = await Brands.findOne({ brand_name });
             if (existingBrand) {
                 return res.status(400).json({ message: 'Brand already exists' });
             }
-            const newBrand = new Brands({brand_name, brand_logo_url:logoUrl });
+            const newBrand = new Brands({ brand_name, brand_logo_url: logoUrl });
             await newBrand.save();
 
             res.status(200).json(newBrand);
@@ -76,46 +75,46 @@ const brandController = {
         }
     },
 
-   
 
-  
+
+
     updateBrand: async (req, res) => {
-    try {
-        const { _id } = req.params;
-        const { brand_name } = req.body; 
-        const brand_logo_url = req.file ? `http://localhost:4000/${req.file.path.replace(/\\/g, '/')}` : null; // Đường dẫn đầy đủ cho logo
+        try {
+            const { _id } = req.params;
+            const { brand_name } = req.body;
+            const brand_logo_url = req.file ? `http://localhost:4000/${req.file.path.replace(/\\/g, '/')}` : null; // Đường dẫn đầy đủ cho logo
 
-     
-        const updateData = {
-            brand_name,
-        };
 
-        
-        if (brand_logo_url) {
-            updateData.brand_logo_url = brand_logo_url;
+            const updateData = {
+                brand_name,
+            };
+
+
+            if (brand_logo_url) {
+                updateData.brand_logo_url = brand_logo_url;
+            }
+
+            const updatedBrand = await Brands.findOneAndUpdate(
+                { _id },
+                updateData,
+                { new: true }
+            );
+
+            if (!updatedBrand) {
+                return res.status(404).json({ message: 'Brand not found' });
+            }
+
+            res.status(200).json({updatedBrand});
+        } catch (error) {
+            res.status(500).json({ message: 'Error updating brand', error: error.message });
         }
-
-        const updatedBrand = await Brands.findOneAndUpdate(
-            {_id },
-            updateData,
-            { new: true } 
-        );
-
-        if (!updatedBrand) {
-            return res.status(404).json({ message: 'Brand not found' });
-        }
-
-        res.status(200).json(updatedBrand);
-    } catch (error) {
-        res.status(500).json({ message: 'Error updating brand', error: error.message });
-    }
-},
+    },
 
 
- 
+
     deleteBrand: async (req, res) => {
         try {
-            const {_id } = req.params;
+            const { _id } = req.params;
             const deletedBrand = await Brands.findOneAndDelete({ _id });
 
             if (!deletedBrand) {

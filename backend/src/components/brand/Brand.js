@@ -1,218 +1,170 @@
 import React, { useEffect, useState } from 'react';
-
 import axios from 'axios';
-
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
-import { Image, Pagination, Modal } from 'antd';
+import { Table, Pagination, Popconfirm, Tooltip, Modal, Button, Image, Input } from 'antd';
+import { DeleteOutlined, PlusOutlined, EditOutlined } from '@ant-design/icons';
 import CreateBrand from './CreateBrand';
+import UpdateBrand from './UpdateBrand';
 
 const Brand = () => {
-    const [listbrand, setlistbrand] = useState([]);
+    const [listBrand, setListBrand] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize] = useState(5);
+    const [total, setTotal] = useState(0);
 
-    const [createbrand, setcreatebrand] = useState(false);
-
-    const [edit, setedit] = useState(false);
-    const [idedit, setidedit] = useState(null);
-
-    const [newBrandName, setNewBrandName] = useState('');
-
-    const [newBrandLogo, setNewBrandLogo] = useState(null);
-    const [searchbrand, setsearchbrand] = useState('');
-
-    const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
-    const [pageSize] = useState(5); // Số mục trên mỗi trang
-    const [total, setTotal] = useState(0); // Tổng số mục
+    const [createBrandVisible, setCreateBrandVisible] = useState(false);
+    const [editBrandVisible, setEditBrandVisible] = useState(false);
+    const [brandId, setBrandId] = useState('');
+    const [searchBrand, setSearchBrand] = useState('');
 
     useEffect(() => {
-        fetchBrands();
+        fetchBrands(currentPage);
     }, [currentPage]);
 
     const fetchBrands = async (page = currentPage) => {
         try {
             const res = await axios.get(`http://localhost:4000/api/brand/get?page=${page}&size=${pageSize}`, {
                 headers: {
-                    'Cache-Control': 'no-cache', // Tắt caching
+                    'Cache-Control': 'no-cache',
                     'Pragma': 'no-cache',
                     'Expires': '0',
                 },
             });
-            setlistbrand(res.data.brands);
+            setListBrand(res.data.brands);
             setTotal(res.data.total);
         } catch (err) {
-            console.log(err);
+            console.error('Error fetching brands:', err);
         }
     };
-    
 
     const handleSearch = async (e) => {
         e.preventDefault();
-        if (!searchbrand.trim()) {
+        if (!searchBrand.trim()) {
             fetchBrands();
             return;
         }
         try {
-            const res = await axios.get(`http://localhost:4000/api/brand/get/${searchbrand}`);
-            setlistbrand(res.data);
+            const res = await axios.get(`http://localhost:4000/api/brand/get/${searchBrand}`);
+            setListBrand(res.data);
         } catch (err) {
-            console.log(err);
+            console.error('Error searching brand:', err);
         }
     };
 
-    const handleEdit = (item) => {
-        setedit(true);
-        setidedit(item._id);
-        setNewBrandLogo(item.brand_logo_url);
-        setNewBrandName(item.brand_name);
-    };
-
-    const handleSave = async (item) => {
-        const formData = new FormData();
-        formData.append('_id', item._id);
-        formData.append('brand_name', newBrandName);
-        if (newBrandLogo instanceof File) {
-            formData.append('brand_logo', newBrandLogo);
-        }
+    const handleDelete = async (id) => {
         try {
-            const res = await axios.put(`http://localhost:4000/api/brand/update/${item._id}`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-            console.log('Brand updated successfully:', res.data);
-            fetchBrands();
-            setedit(false);
-        } catch (err) {
-            console.error('Error while updating brand:', err);
-        }
-    };
-
-    const handleDelete = async (item) => {
-        const confirmDelete = window.confirm(`Bạn có chắc chắn muốn xóa thương hiệu ${item.brand_name}?`);
-        if (!confirmDelete) {
-            return;
-        }
-
-        try {
-            const res = await axios.delete(`http://localhost:4000/api/brand/delete/${item._id}`);
-            console.log('Brand deleted successfully:', res.data);
+            await axios.delete(`http://localhost:4000/api/brand/delete/${id}`);
             toast.success('Xóa thương hiệu thành công!');
-            fetchBrands();
+            fetchBrands(currentPage);
         } catch (err) {
-            console.error('Error while deleting brand:', err);
+            console.error('Error deleting brand:', err);
             toast.error('Có lỗi xảy ra khi xóa thương hiệu!');
         }
     };
 
-
+    const columns = [
+        {
+            title: 'LOGO',
+            dataIndex: 'brand_logo_url',
+            render: (logoUrl) => <Image style={{ width: 50, height: 50 }} src={logoUrl} />,
+        },
+        {
+            title: 'Tên thương hiệu',
+            dataIndex: 'brand_name',
+        },
+        {
+            title: 'Actions',
+            render: (text, record) => (
+                <div style={{ display: 'flex', gap: '10px' }}>
+                    <Tooltip title="Chỉnh sửa">
+                        <EditOutlined
+                            style={{ color: 'blue', cursor: 'pointer' }}
+                            onClick={() => {
+                                setBrandId(record._id);
+                                setEditBrandVisible(true);
+                            }}
+                        />
+                    </Tooltip>
+                    <Tooltip title="Xóa">
+                        <Popconfirm
+                            title="Bạn có chắc chắn muốn xóa thương hiệu này?"
+                            onConfirm={() => handleDelete(record._id)}
+                            okText="Xóa"
+                            cancelText="Hủy"
+                        >
+                            <DeleteOutlined
+                                style={{ color: 'red', cursor: 'pointer' }}
+                            />
+                        </Popconfirm>
+                    </Tooltip>
+                </div>
+            ),
+        },
+    ];
 
     return (
         <div className="container mt-4">
-            <nav className="navbar navbar-light bg-light justify-content-between">
-                <a className="navbar-brand">Brands List</a>
-                <form className="d-flex" onSubmit={handleSearch}>
-                    <input
-                        className="form-control mr-sm-2 me-2"
-                        type="search"
-                        placeholder="Search"
-                        aria-label="Search"
-                        value={searchbrand}
-                        onChange={(e) => setsearchbrand(e.target.value)}
-                    />
-                    <button className="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-                </form>
-            </nav>
+            <h2>Danh sách thương hiệu</h2>
 
-            <table className="table table-striped table-bordered">
-                <thead className="table-light">
-                    <tr>
-                        <th>LOGO</th>
-                        <th>Name</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {listbrand.map((item) => (
-                        <tr key={item._id}>
-                            {edit === true && idedit === item._id ? (
-                                <>
-                                    <td>
-                                        <input
-                                            type="file"
-                                            onChange={(e) => setNewBrandLogo(e.target.files[0])}
-                                        />
-                                    </td>
-                                    <td>
-                                        <input
-                                            type="text"
-                                            value={newBrandName}
-                                            onChange={(e) => setNewBrandName(e.target.value)}
-                                            placeholder="Brand name"
-                                        />
-                                    </td>
-                                    <td>
-                                        <button className="btn btn-warning me-2" onClick={() => handleSave(item)}>
-                                            Save
-                                        </button>
-                                    </td>
-                                </>
-                            ) : (
-                                <>
-                                    <td>
-                                        <Image
-                                            style={{ width: '50px', height: '50px', cursor: 'pointer' }}
-                                            src={item.brand_logo_url}
-                                        />
-                                    </td>
-                                    <td>{item.brand_name}</td>
-                                    <td>
-                                        <button className="btn btn-warning me-2" onClick={() => handleEdit(item)}>
-                                            Edit
-                                        </button>
-                                        <button className="btn btn-danger" onClick={() => handleDelete(item)}>
-                                            Delete
-                                        </button>
-                                    </td>
-                                </>
-                            )}
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+            {/* Tìm kiếm thương hiệu */}
+            <div style={{ marginBottom: 20 }}>
+                <Input
+                    placeholder="Tìm kiếm thương hiệu"
+                    value={searchBrand}
+                    onChange={(e) => setSearchBrand(e.target.value)}
+                    style={{ width: '250px', marginRight: '10px' }}
+                />
+                <Button type="primary" onClick={handleSearch}>
+                    Tìm kiếm
+                </Button>
+            </div>
 
+            {/* Bảng danh sách thương hiệu */}
+            <Table
+                columns={columns}
+                dataSource={listBrand}
+                rowKey="_id"
+                pagination={false}
+            />
+
+            {/* Phân trang */}
             <Pagination
-                align="end"
                 current={currentPage}
                 pageSize={pageSize}
                 total={total}
-                onChange={(page) => {
-                    setCurrentPage(page);
-                    fetchBrands(page); // Gọi lại hàm fetch với trang mới
-                }}
+                onChange={(page) => setCurrentPage(page)}
+                style={{ marginTop: '20px', textAlign: 'right' }}
             />
 
+            {/* Thêm thương hiệu */}
             <div className="d-flex justify-content-center mt-3">
-                <button className="btn btn-primary" onClick={() => setcreatebrand(true)}>
-                    Add Brand
-                </button>
+                <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => setCreateBrandVisible(true)}>
+                    Thêm thương hiệu
+                </Button>
             </div>
+
+            {/* Modal Thêm thương hiệu */}
             <Modal
-        title="ADD BRAND"
-        centered
-        open={createbrand}
-        onCancel={() => setcreatebrand(false)}
-        footer={null}
-      >
-        <CreateBrand onSuccess={()=>{
-            setcreatebrand(false);
-            fetchBrands();
-            }}/>
-      </Modal>
+                title="Thêm thương hiệu"
+                centered
+                open={createBrandVisible}
+                onCancel={() => setCreateBrandVisible(false)}
+                footer={null}
+            >
+                <CreateBrand onSuccess={() => { setCreateBrandVisible(false); fetchBrands(currentPage); }} />
+            </Modal>
 
-
-
-            
+            {/* Modal Chỉnh sửa thương hiệu */}
+            <Modal
+                title="Chỉnh sửa thương hiệu"
+                centered
+                open={editBrandVisible}
+                onCancel={() => setEditBrandVisible(false)}
+                footer={null}
+            >
+                <UpdateBrand brandId={brandId} onSuccess={() => { setEditBrandVisible(false); fetchBrands(currentPage); }} />
+            </Modal>
         </div>
     );
 };
