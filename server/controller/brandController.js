@@ -29,13 +29,14 @@ const brandController = {
         }
     }
     ,
+
     getBrandById: async (req, res) => {
         try {
-            const brand= await Brands.findById(req.params._id); 
+            const brand= await Brands.findById({_id:req.params._id}); 
             if (!brand) {
                 return res.status(404).json({ message: 'Brand not found' });
             }
-            res.status(200).json({ brand });
+            res.status(200).json({brand});
         } catch (error) {
             res.status(500).json({ message: 'Error fetching brand', error: error.message });
         }

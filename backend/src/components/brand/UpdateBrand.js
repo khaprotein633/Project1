@@ -16,46 +16,49 @@ const getBase64 = (file) =>
 const UpdateBrand = ({ brandId, onSuccess }) => {
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
-    const [brandData, setBrandData] = useState(null); // Changed initial state to null
-    const [newLogo, setNewLogo] = useState(null);
+    const [brandData, setBrandData] = useState(null);
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
     const [fileList, setFileList] = useState([]);
 
     useEffect(() => {
-        if (brandId) {  // Ensure brandId is valid before making request
+        if (brandId) {
             fetchBrandData();
-            form.setFieldsValue({
-              brand_name: brandData.brand.brand_name,
-              brand_logo: brandData.brand.brand_logo_url ? [{
-                  uid: '-1', name: 'brand_logo', status: 'done', url: brandData.brand.brand_logo_url
-              }] : [],
-          });
         }
     }, [brandId]);
 
     const fetchBrandData = async () => {
         try {
-            const res = await axios.get(`http://localhost:4000/api/brand/get/${brandId}`);
-            setBrandData(res.data.brand);
-            
+            const res = await axios.get(`http://localhost:4000/api/brand/getbyid/${brandId}`);
+            const brand = res.data.brand;
+
+            setBrandData(brand);
+
+            form.setFieldsValue({
+                brand_name: brand.brand_name,
+            });
+
+            if (brand.brand_logo_url) {
+                setFileList([
+                    {
+                        uid: '-1',
+                        name: 'brand_logo',
+                        status: 'done',
+                        url: brand.brand_logo_url,
+                    },
+                ]);
+            }
         } catch (err) {
             console.error(err);
             toast.error('Lỗi khi lấy thông tin thương hiệu!');
         }
     };
 
-    const handleLogoChange = (info) => {
-        if (info.file.status === 'done') {
-            setNewLogo(info.file.originFileObj);
-            message.success(`${info.file.name} file uploaded successfully`);
-        } else if (info.file.status === 'error') {
-            message.error(`${info.file.name} file upload failed.`);
+    const handleLogoChange = ({ fileList }) => {
+        if (fileList.length > 1) {
+            fileList = [fileList[fileList.length - 1]];
         }
-    };
-
-    const handleRemoveImage = (file) => {
-        setFileList((prev) => prev.filter(f => f.uid !== file.uid));
+        setFileList(fileList);
     };
 
     const handlePreview = async (file) => {
@@ -72,17 +75,20 @@ const UpdateBrand = ({ brandId, onSuccess }) => {
         try {
             const formData = new FormData();
             formData.append('brand_name', values.brand_name);
-            if (newLogo) {
-                formData.append('brand_logo', newLogo);
+
+            // Thêm logo nếu có thay đổi
+            if (fileList.length > 0 && fileList[0].originFileObj) {
+                formData.append('brand_logo', fileList[0].originFileObj);
             }
 
-            const res = await axios.put(`http://localhost:4000/api/brand/update/${brandId}`, formData, {
+            await axios.put(`http://localhost:4000/api/brand/update/${brandId}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
             });
 
             form.resetFields();
+            setFileList([]);
             if (onSuccess) {
                 onSuccess();
             }
@@ -113,21 +119,20 @@ const UpdateBrand = ({ brandId, onSuccess }) => {
                     <Input />
                 </Form.Item>
 
-                <Form.Item
-                    label="Logo thương hiệu"
-                    name="brand_logo"
-                    valuePropName="fileList"
-                    getValueFromEvent={e => e && e.fileList}
-                >
+                <Form.Item label="Logo thương hiệu">
                     <Upload
                         name="brand_logo"
                         listType="picture-card"
-                        maxCount={1}
+                        fileList={fileList}
+                        maxCount={1} // Chỉ cho phép một hình ảnh
                         onPreview={handlePreview}
                         onChange={handleLogoChange}
-                        beforeUpload={() => false}
+                        beforeUpload={() => false} // Không upload tự động
+                        onRemove={() => setFileList([])} // Xóa hình ảnh
                     >
-                        <Button icon={<UploadOutlined />}>Tải logo lên</Button>
+                        {fileList.length < 1 && (
+                            <Button icon={<UploadOutlined />}>Tải logo lên</Button>
+                        )}
                     </Upload>
                 </Form.Item>
 
@@ -146,7 +151,6 @@ const UpdateBrand = ({ brandId, onSuccess }) => {
                     preview={{
                         visible: previewOpen,
                         onVisibleChange: (visible) => setPreviewOpen(visible),
-                        afterOpenChange: (visible) => !visible && setPreviewImage(''),
                     }}
                     src={previewImage}
                 />

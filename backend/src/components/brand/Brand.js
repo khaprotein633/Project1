@@ -17,10 +17,13 @@ const Brand = () => {
     const [editBrandVisible, setEditBrandVisible] = useState(false);
     const [brandId, setBrandId] = useState('');
     const [searchBrand, setSearchBrand] = useState('');
+    const [isSearching, setIsSearching] = useState(false);
 
     useEffect(() => {
-        fetchBrands(currentPage);
-    }, [currentPage]);
+        if (!isSearching) {
+            fetchBrands(currentPage);
+        }
+    }, [currentPage, isSearching]);
 
     const fetchBrands = async (page = currentPage) => {
         try {
@@ -38,29 +41,47 @@ const Brand = () => {
         }
     };
 
-    const handleSearch = async (e) => {
-        e.preventDefault();
-        if (!searchBrand.trim()) {
-            fetchBrands();
+    const fetchBrandName = async () => {
+        try {
+            const res = await axios.get(`http://localhost:4000/api/brand/getbyname/${searchBrand}`, {
+                headers: {
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache',
+                    'Expires': '0',
+                },
+            });
+            setListBrand(res.data.brand);
+            setTotal(res.data.brand.length); // Cập nhật tổng số kết quả tìm kiếm
+            setIsSearching(true);
+        } catch (err) {
+            console.error('Error fetching brands:', err);
+        }
+    };
+
+    const handleSearch = () => {
+        if (searchBrand.trim() === '') {
+            toast.info('Vui lòng nhập từ khóa tìm kiếm!');
             return;
         }
-        try {
-            const res = await axios.get(`http://localhost:4000/api/brand/get/${searchBrand}`);
-            setListBrand(res.data);
-        } catch (err) {
-            console.error('Error searching brand:', err);
-        }
+        setCurrentPage(1); // Reset về trang đầu
+        fetchBrandName();
     };
 
     const handleDelete = async (id) => {
         try {
             await axios.delete(`http://localhost:4000/api/brand/delete/${id}`);
             toast.success('Xóa thương hiệu thành công!');
-            fetchBrands(currentPage);
+            fetchBrands(1);
         } catch (err) {
             console.error('Error deleting brand:', err);
             toast.error('Có lỗi xảy ra khi xóa thương hiệu!');
         }
+    };
+
+    const handleResetSearch = () => {
+        setSearchBrand('');
+        setIsSearching(false);
+        fetchBrands(1);
     };
 
     const columns = [
@@ -115,9 +136,10 @@ const Brand = () => {
                     onChange={(e) => setSearchBrand(e.target.value)}
                     style={{ width: '250px', marginRight: '10px' }}
                 />
-                <Button type="primary" onClick={handleSearch}>
+                <Button type="primary" onClick={handleSearch} style={{ marginRight: '10px' }}>
                     Tìm kiếm
                 </Button>
+                <Button onClick={handleResetSearch}>Làm mới</Button>
             </div>
 
             {/* Bảng danh sách thương hiệu */}

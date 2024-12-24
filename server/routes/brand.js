@@ -7,14 +7,14 @@ const upload = require('../config/upload'); // Import multer configuration
 router.get('/get', brandController.getAllBrands);
 router.get('/getall', brandController.getAll);
 
-router.get('/get/:brand_name', brandController.getBrandByName);
+router.get('/getbyname/:brand_name', brandController.getBrandByName);
 
 
 // POST: Add a new brand
 router.post('/add', upload.single('brand_logo') , brandController.addBrand);
 
 // GET: Get a brand by brand_id
-router.get('/get/:_id', brandController.getBrandById);
+router.get('/getbyid/:_id', brandController.getBrandById);
 
 // PUT: Update a brand by brand_ids
 router.put('/update/:_id',upload.single('brand_logo') ,brandController.updateBrand);
