@@ -61,39 +61,68 @@ const userController = {
 
     addUser: async (req, res) => {
         try {
-            const existingUser = await User.findOne({ email: req.body.email });
-            if (existingUser) {
+            const { email, phoneNumber } = req.body;
+    
+            // Kiểm tra nếu email đã tồn tại
+            const existingEmail = await User.findOne({ email });
+            if (existingEmail) {
                 return res.status(400).json({ message: 'Email đã tồn tại' });
             }
-
-            const newUser = new User({
-                ...req.body
-            });
+    
+            // Kiểm tra nếu số điện thoại đã tồn tại
+            if (phoneNumber) {
+                const existingPhone = await User.findOne({ phoneNumber });
+                if (existingPhone) {
+                    return res.status(400).json({ message: 'Số điện thoại đã tồn tại' });
+                }
+            }
+    
+            // Tạo người dùng mới
+            const newUser = new User(req.body);
             await newUser.save();
             res.status(201).json(newUser);
         } catch (error) {
-            console.error('Error adding user:', error); a
+            console.error('Error adding user:', error);
             res.status(500).json({ message: 'Internal Server Error' });
         }
     },
+    
 
-    // Update a user by user_id
     updateUser: async (req, res) => {
         try {
+            // Kiểm tra nếu email hoặc số điện thoại có thay đổi và đã tồn tại
+            if (req.body.email) {
+                const existingEmail = await User.findOne({ email: req.body.email });
+                if (existingEmail && existingEmail._id.toString() !== req.params._id) {
+                    return res.status(400).json({ message: 'Email đã tồn tại' });
+                }
+            }
+    
+            if (req.body.phoneNumber) {
+                const existingPhone = await User.findOne({ phoneNumber: req.body.phoneNumber });
+                if (existingPhone && existingPhone._id.toString() !== req.params._id) {
+                    return res.status(400).json({ message: 'Số điện thoại đã tồn tại' });
+                }
+            }
+    
+            // Cập nhật người dùng
             const user = await User.findOneAndUpdate(
                 { _id: req.params._id },
                 req.body,
                 { new: true }
             );
+    
             if (!user) {
                 return res.status(404).json({ message: 'User not found' });
             }
+    
             res.status(200).json(user);
         } catch (error) {
             console.error('Error updating user:', error);
             res.status(500).json({ message: 'Internal Server Error' });
         }
     },
+    
 
     // Delete a user by user_id
     deleteUser: async (req, res) => {
@@ -107,7 +136,25 @@ const userController = {
             console.error('Error deleting user:', error);
             res.status(500).json({ message: 'Internal Server Error' });
         }
-    }
+    },
+    loginUser: async (req, res) => {
+        try {
+            const user = await User.findOne({ email: req.body.email });
+            if (!user) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+
+            if (user.password !== req.body.password) {
+                return res.status(401).json({ message: 'Password is not matching' });
+            }
+
+            const { password, ...userWithoutPassword } = user.toObject();
+            res.status(200).json(userWithoutPassword);
+        } catch (error) {
+            console.error('Error fetching user:', error);
+            res.status(500).json({ message: 'Internal Server Error' });
+        }
+    },
 };
 
 module.exports = userController;

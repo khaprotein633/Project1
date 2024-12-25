@@ -62,6 +62,9 @@ const DiscountRoute = require('./routes/discount');
 app.use('/api/discount',DiscountRoute);
 
 
+const payment = require("./controller/paymentController");
+app.use("/api/payment/", payment);
+
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.listen(4000, () => {

@@ -19,4 +19,6 @@ router.put('/update/:_id', userController.updateUser);
 // Xóa người dùng theo ID
 router.delete('/delete/:_id', userController.deleteUser);
 
+router.post('/loginUser', userController.loginUser);
+
 module.exports = router;
