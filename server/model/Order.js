@@ -11,7 +11,7 @@ const orderSchema = new mongoose.Schema({
   user_id: { type: String, ref: 'User', required: true },
   total_amount: { type: Number, required: true },
   orders_date: { type: Date, default: Date.now },
-  delivery_date: { type: Date },
+  delivery_date: { type: Date , default:null},
   shipping_address: { type: String, required: true },
   user_phone: { type: String, required: true },
   order_status: { type: String, required: true },

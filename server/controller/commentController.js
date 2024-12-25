@@ -1,51 +1,104 @@
 const Comment = require('../model/Comment');
 
+// Danh sách từ khóa xấu để kiểm duyệt bình luận
+const bannedWords = ['CC', 'VL', 'DUMA','dm']; 
+
 const commentController = {
-    // Get all comments
+
     getAllComments: async (req, res) => {
         try {
-            const comments = await Comment.find(); // Get all comments
-            res.status(200).json(comments);
+            const page = parseInt(req.query.page) || 1;
+            const size = parseInt(req.query.size) || 7;
+            const skip = (page - 1) * size;
+
+            const list = await Comment.find({})
+                .skip(skip)
+                .limit(size);
+            const total = await Comment.countDocuments();
+            res.status(200).json({ list, total });
         } catch (error) {
             console.error('Error fetching comments:', error);
             res.status(500).json({ message: 'Internal Server Error' });
         }
     },
 
-    // Get comments by product_id
     getCommentsByProductId: async (req, res) => {
         try {
-            const comments = await Comment.find({ product_id: req.params.product_id }); // Find comments by product_id
-            if (!comments.length) {
-                return res.status(404).json({ message: 'No comments found for this product' });
+            const { rating, product_id } = req.params
+            const page = parseInt(req.query.page) || 1;
+            const size = parseInt(req.query.size) || 7;
+            const skip = (page - 1) * size;
+    
+            const filter = {};
+    
+            // Lọc theo rating nếu có
+            if (rating) {
+                filter.rating = parseInt(rating);
             }
-            res.status(200).json(comments);
+    
+            // Lọc theo product_id nếu có
+            if (product_id) {
+                filter.product_id = product_id;
+            }
+    
+            const list = await Comment.find(filter)
+                .skip(skip)
+                .limit(size);
+            const total = await Comment.countDocuments(filter);
+    
+            res.status(200).json({ list, total });
         } catch (error) {
-            console.error('Error fetching comments:', error);
+            console.error('Error fetching filtered comments by rating and product_id:', error);
             res.status(500).json({ message: 'Internal Server Error' });
         }
     },
 
-    // Add a new comment
     addComment: async (req, res) => {
         try {
-            const newComment = new Comment(req.body); // Create a new comment instance
-            await newComment.save(); // Save the comment to the database
-            res.status(201).json(newComment); // Return the created comment
+            const { comment, rating, product_id, user_id } = req.body;
+
+            const hasBannedWords = bannedWords.some(word => comment.toLowerCase().includes(word.toLowerCase()));
+            if (hasBannedWords) {
+                return res.status(400).json({ message: 'Comment contains inappropriate language.' });
+            }
+
+            const orders = await Order.find({
+                user_id: user_id,
+                order_status: 'Đã giao'  
+            });
+
+            let hasPurchased = false;
+
+            for (let order of orders) {
+                const productInOrder = order.order_details.some(orderDetail => orderDetail.product_id.toString() === product_id);
+                if (productInOrder) {
+                    hasPurchased = true;
+                    break;
+                }
+            }
+
+            if (!hasPurchased) {
+                return res.status(400).json({ message: 'You must purchase the product before leaving a review.' });
+            }
+
+            const newComment = new Comment({
+                product_id,
+                user_id,
+                rating,
+                comment,
+                review_date: new Date()
+            });
+
+            await newComment.save();
+            res.status(201).json(newComment);
         } catch (error) {
             console.error('Error adding comment:', error);
             res.status(500).json({ message: 'Internal Server Error' });
         }
     },
-
-    // Update a comment by product_review_id
     updateComment: async (req, res) => {
         try {
-            const comment = await Comment.findOneAndUpdate(
-                { product_review_id: req.params.product_review_id },
-                req.body,
-                { new: true } // Return the updated comment
-            );
+            const comment = await Comment.findOneAndUpdate({ _id: req.params._id }, req.body, { new: true });
             if (!comment) {
                 return res.status(404).json({ message: 'Comment not found' });
             }
@@ -56,14 +109,13 @@ const commentController = {
         }
     },
 
-    // Delete a comment by product_review_id
     deleteComment: async (req, res) => {
         try {
-            const comment = await Comment.findOneAndDelete({ product_review_id: req.params.product_review_id }); // Find and delete the comment
+            const comment = await Comment.findOneAndDelete({ _id: req.params._id });
             if (!comment) {
                 return res.status(404).json({ message: 'Comment not found' });
             }
-            res.status(204).send(); // No content
+            res.status(204).send();
         } catch (error) {
             console.error('Error deleting comment:', error);
             res.status(500).json({ message: 'Internal Server Error' });

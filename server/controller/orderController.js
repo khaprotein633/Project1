@@ -3,6 +3,7 @@ const Order = require('../model/Order');
 const Product = require('../model/Product');
 
 const orderController = {
+
     getAllOrders: async (req, res) => {
         try {
             const page = parseInt(req.query.page) || 1;
@@ -10,21 +11,20 @@ const orderController = {
             const skip = (page - 1) * size;
             const list = await Order.find({}).skip(skip).limit(size);
             const total = await Order.countDocuments();
-            res.status(200).json({ list, total });
+            res.status(200).json({ list, total});
         } catch (error) {
             console.error('Error fetching orders:', error);
             res.status(500).json({ message: 'Internal Server Error' });
         }
     },
 
-    
     getOrderById: async (req, res) => {
         try {
-            const order = await Order.findOne({ _id: req.params.order_id });
+            const order = await Order.findOne({ _id: req.params._id });
             if (!order) {
                 return res.status(404).json({ message: 'Order not found' });
             }
-            res.status(200).json(order);
+            res.status(200).json({order});
         } catch (error) {
             console.error('Error fetching order:', error);
             res.status(500).json({ message: 'Internal Server Error' });
@@ -86,7 +86,8 @@ const orderController = {
                 user_phone: user_phone,
                 order_status: order_status,
                 payment_method: payment_method,
-                order_details: orderDetails
+                order_details: orderDetails,
+                delivery_date: null
             });
            
             await newOrder.save();
@@ -103,21 +104,31 @@ const orderController = {
 
     updateOrder: async (req, res) => {
         try {
+            const { order_status } = req.body;
+
+            // Check if the order status is "Đang giao" to update the delivery date
+            let updateFields = { ...req.body };
+
+            if (order_status === 'Đang giao') {
+                updateFields.delivery_date = new Date(); // Set delivery date to current date
+            }
+
             const order = await Order.findOneAndUpdate(
                 { _id: req.params._id },
-                req.body,
+                updateFields,
                 { new: true }
             );
+
             if (!order) {
                 return res.status(404).json({ message: 'Order not found' });
             }
-            res.status(200).json(order);  
+
+            res.status(200).json(order);
         } catch (error) {
             console.error('Error updating order:', error);
             res.status(500).json({ message: 'Internal Server Error' });
         }
     },
-
     deleteOrder: async (req, res) => {
         try {
             const order = await Order.findOneAndDelete({ _id: req.params._id });
