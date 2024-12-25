@@ -45,16 +45,28 @@ const productController = {
 
     getProductsByCategoryId: async (req, res) => {
         try {
-            const products = await Product.find({ category_id: req.params.category_id });
+            const products = await Product.find({ category_id: req.params.category_id }).select("-__v"); // Loại bỏ trường không cần thiết
             if (!products.length) {
-                return res.status(404).json({ message: 'No products found for this category' });
+                return res.status(200).json({ 
+                    success: true, 
+                    message: 'Không có sản phẩm nào trong danh mục này', 
+                    products: [] 
+                });
             }
-            res.status(200).json(products);
+            res.status(200).json({
+                success: true,
+                message: 'Danh sách sản phẩm theo danh mục',
+                products,
+            });
         } catch (error) {
             console.error('Error fetching products by category_id:', error);
-            res.status(500).json({ message: 'Internal Server Error' });
+            res.status(500).json({ 
+                success: false, 
+                message: 'Lỗi máy chủ, vui lòng thử lại sau' 
+            });
         }
     },
+    
     getProductsByName: async (req, res) => {
         try {
             const products = await Product.find({ product_name: { $regex: req.params.product_name, $options: 'i' } });
