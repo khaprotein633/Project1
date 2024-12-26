@@ -1,17 +1,22 @@
 const mongoose = require('mongoose');
+const Cart = require('./Cart');
 
-// Định nghĩa schema cho Order
-const orderSchema = new mongoose.Schema({
-  orders_id: { type: String, required: true, unique: true }, // ID duy nhất cho đơn hàng
-  user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Khóa ngoại tham chiếu đến User
-  total_amount: { type: Number, required: true }, // Tổng số tiền của đơn hàng
-  orders_date: { type: Date, default: Date.now }, // Ngày đặt hàng
-  delivery_date: Date, // Ngày giao hàng
-  shipping_address: { type: String, required: true }, // Địa chỉ giao hàng
-  user_phone: { type: String, required: true }, // Số điện thoại người dùng
-  order_status_id: { type: mongoose.Schema.Types.ObjectId, ref: 'OrderStatus', required: true }, // Khóa ngoại tham chiếu đến OrderStatus
-  payment_status: { type: String, required: true } // Trạng thái thanh toán
+const orderdetailSchema = new mongoose.Schema({
+  product_id: { type: String, ref: 'Product', required: true },
+  inventory_id:{type: String,require: true},
+  quantity: { type: Number, required: true }
 });
 
-// Xuất model Order
+const orderSchema = new mongoose.Schema({
+  user_id: { type: String, ref: 'User', required: true },
+  total_amount: { type: Number, required: true },
+  orders_date: { type: Date, default: Date.now },
+  delivery_date: { type: Date , default:null},
+  shipping_address: { type: String, required: true },
+  user_phone: { type: String, required: true },
+  order_status: { type: String, required: true },
+  payment_method: { type: String, required: true},
+  order_details: [orderdetailSchema]
+}, { versionKey: false });
+
 module.exports = mongoose.model('Order', orderSchema);

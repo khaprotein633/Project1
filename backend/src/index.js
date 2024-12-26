@@ -8,10 +8,17 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
-import Users from './components/home/Users';
-import Orders from './components/home/Orders';
+
 import NotFoundPage from './components/home/NotFoundPage';
 import Home from './components/home/Home';
+import Brand from './components/brand/Brand';
+import CreateBrand from './components/brand/CreateBrand';
+import User from './components/user/User';
+import Product from './components/product/Product';
+import Category from './components/category/Category';
+import Order from './components/order/Order';
+import Comments from './components/comment/Comments';
+import Discount from './components/discount/Discount';
 
 const router = createBrowserRouter([
   {
@@ -24,12 +31,36 @@ const router = createBrowserRouter([
         element: <Home />
       },
       {
+        path: "brand",
+        element: <Brand />
+      },
+      {
+        path: "createbrand",
+        element: <CreateBrand />
+      },
+      {
         path: "user",
-        element: <Users />
+        element: <User/>
       },
       {
         path: "order",
-        element: <Orders />
+        element: <Order/>  
+      },
+      {
+        path: "product",
+        element: <Product/>
+      },
+      {
+        path: "category",
+        element: <Category/>
+      },
+      {
+        path: "comments",
+        element: <Comments/>
+      },
+      {
+        path: "discount",
+        element: <Discount/>
       },
       {
         path: "report",

@@ -1,0 +1,16 @@
+.order-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  height: 100vh; /* Full height of the viewport */
+  text-align: center; /* Center the text inside the <h5> */
+  .order-success {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center; /* Remove default margins for better centering */
+  }
+}
+
