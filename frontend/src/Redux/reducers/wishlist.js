@@ -3,106 +3,106 @@ const initialState = {
     isLoading: true,
 };
 
-export const cartReducer = createReducer(initialState, {
-    cartCreateRequest: (state) => {
+export const wishListReducer = createReducer(initialState, {
+    wishListCreateRequest: (state) => {
         state.isLoading = true;
     },
-    cartCreateSuccess: (state, action) => {
+    wishListCreateSuccess: (state, action) => {
         state.isLoading = false;
-        state.cart = action.payload;
+        state.wishList = action.payload;
         state.success = true;
     },
-    cartCreateFail: (state, action) => {
+    wishListCreateFail: (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
         state.success = false;
     },
-    cartUpdateRequest: (state) => {
+    wishListUpdateRequest: (state) => {
         state.isLoading = true;
     },
-    cartUpdateSuccess: (state, action) => {
+    wishListUpdateSuccess: (state, action) => {
         state.isLoading = false;
-        state.cart = state.cart.map((item) =>
+        state.wishList = state.wishList.map((item) =>
           item.id === action.payload.id ? action.payload : item
         );
         state.success = true;
     },
-    cartUpdateFail: (state, action) => {
+    wishListUpdateFail: (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
         state.success = false;
     },
       
-    //update cart
-    cartUpdateRequest: (state) => {
+    //update wishList
+    wishListUpdateRequest: (state) => {
         state.isLoading = true;
     },
-    cartUpdateSuccess: (state, action) => {
+    wishListUpdateSuccess: (state, action) => {
         state.isLoading = false;
-        state.cart = action.payload;
+        state.wishList = action.payload;
         state.success = true;
     },
-    cartUpdateFail: (state, action) => {
+    wishListUpdateFail: (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
         state.success = false;
     },
-    // get carts for update
-    getCartByUserIdRequest: (state) => {
+    // get wishLists for update
+    getWishListByUserIdRequest: (state) => {
         state.isLoading = true;
     },
-    // get carts for update
-    getCartByUserIdSuccess: (state, action) => {
+    // get wishLists for update
+    getWishListByUserIdSuccess: (state, action) => {
         state.isLoading = false;
-        state.cart = action.payload;
+        state.wishList = action.payload;
         state.success = true;
     },
-    // get carts for update
-    getCartByUserIdFail: (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload;
-        state.success = false;
-    },
-
-    // get carts for update
-    getCartsForUpdateRequest: (state) => {
-        state.isLoading = true;
-    },
-    // get carts for update
-    getCartsForUpdateSuccess: (state, action) => {
-        state.isLoading = false;
-        state.cart = action.payload;
-        state.success = true;
-    },
-    // get carts for update
-    getCartsForUpdateFail: (state, action) => {
+    // get wishLists for update
+    getWishListByUserIdFail: (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
         state.success = false;
     },
 
-
-    // delete cart of a shop
-    deleteCartRequest: (state) => {
+    // get wishLists for update
+    getWishListsForUpdateRequest: (state) => {
         state.isLoading = true;
     },
-    deleteCartSuccess: (state, action) => {
+    // get wishLists for update
+    getWishListsForUpdateSuccess: (state, action) => {
+        state.isLoading = false;
+        state.wishList = action.payload;
+        state.success = true;
+    },
+    // get wishLists for update
+    getWishListsForUpdateFail: (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+        state.success = false;
+    },
+
+
+    // delete wishList of a shop
+    deleteWishListRequest: (state) => {
+        state.isLoading = true;
+    },
+    deleteWishListSuccess: (state, action) => {
         state.isLoading = false;
         state.message = action.payload;
     },
-    deleteCartFailed: (state, action) => {
+    deleteWishListFailed: (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
     },
-    // get all carts
-    getAllCartsRequest: (state) => {
+    // get all wishLists
+    getAllWishListsRequest: (state) => {
         state.isLoading = true;
     },
-    getAllCartsSuccess: (state, action) => {
+    getAllWishListsSuccess: (state, action) => {
         state.isLoading = false;
-        state.allCarts = action.payload;
+        state.allWishLists = action.payload;
     },
-    getAllCartsFailed: (state, action) => {
+    getAllWishListsFailed: (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
     },

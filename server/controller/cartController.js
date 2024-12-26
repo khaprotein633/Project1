@@ -81,22 +81,19 @@ const cartController = {
             const  cartitemId = req.params.cartitem_id;
             const {  userId,quantity } = req.body;
 
-            if (quantity < 1) {
-                return res.status(400).json({ message: 'Quantity must be at least 1' });
-            }
 
             const cart = await Cart.findOne({userId: userId});
-
+            console.log(cart);
             if (!cart) {
-                return res.status(404).json({ message: 'Cart not found' });
+                return res.status(400).json({ message: 'Cart not found' });
             }
 
             const item = cart.items.id(cartitemId);
 
             if (!item) {
-                return res.status(404).json({ message: 'Cart item not found' });
+                return res.status(400).json({ message: 'Cart item not found' });
             }
-            item.quantity = quantity;
+            item.quantity += quantity;
             
             
             await cart.save();

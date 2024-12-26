@@ -1,55 +1,55 @@
 import axios from "axios";
 import { server } from "../../Config/server";
-// add cart 
-export const AddCart =
+// add wishList 
+export const AddWishList =
   (
-    cartItem
+    wishListItem
   ) =>
     async (dispatch) => {
       try {
         dispatch({
-          type: "cartCreateRequest",
+          type: "wishListCreateRequest",
         });
         // const config = {headers :{"Content-Type":"multipart/form-data"}};
 
         // const {data }= await axios.post(`${server }/product/create-product`,newForm, config);
         const data = await axios.post(
-          `${server}/cart/add `,
-          cartItem
+          `${server}/wishlist/add `,
+          wishListItem
         );
         dispatch({
-          type: "cartCreateSuccess",
+          type: "wishListCreateSuccess",
           payload: data,
         });
       } catch (error) {
         dispatch({
-          type: "cartCreateFail",
+          type: "wishListCreateFail",
           payload: error.response.data.message,
         });
       }
     };
-export const updateCartItem =
-  (cartItemId, updateData) =>
+export const updateWishListItem =
+  (wishListItemId, updateData) =>
     async (dispatch) => {
       try {
         dispatch({
-          type: "cartUpdateRequest",
+          type: "wishListUpdateRequest",
         });
 
         // Gửi request PUT để cập nhật thông tin
         const { data } = await axios.put(
-          `${server}/cart/update/${cartItemId}`,
+          `${server}/wishlist/update/${wishListItemId}`,
           updateData
         );
 
         dispatch({
-          type: "cartUpdateSuccess",
+          type: "wishListUpdateSuccess",
           payload: data,
         });
       } catch (error) {
         dispatch({
-          type: "cartUpdateFail",
-          payload: error.response?.data?.message || "Failed to update cart item",
+          type: "wishListUpdateFail",
+          payload: error.response?.data?.message || "Failed to update wishList item",
         });
       }
     };
@@ -107,23 +107,23 @@ export const updateProduct =
     };
 
 // get Product for update
-export const getCartByUserId = (id) => async (dispatch) => {
+export const getWishListByUserId = (id) => async (dispatch) => {
   try {
     dispatch({
-      type: "getCartByUserIdRequest",
+      type: "getWishListByUserIdRequest",
     });
 
-    const response = await axios.get(`${server}/cart/get/${id}`, {
+    const response = await axios.get(`${server}/wishList/get/${id}`, {
       withCredentials: true,
     });
 
     dispatch({
-      type: "getCartByUserIdSuccess",
+      type: "getWishListByUserIdSuccess",
       payload: response.data,
     });
   } catch (error) {
     dispatch({
-      type: "getCartByUserIdFail",
+      type: "getWishListByUserIdFail",
       payload: error.message,
     });
   }

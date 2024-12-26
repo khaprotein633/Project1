@@ -6,6 +6,7 @@ import storage from 'redux-persist/lib/storage'; // defaults to localStorage for
 import { userReducer } from './reducers/user';
 import { productReducer } from './reducers/product';
 import { cartReducer } from './reducers/cart';
+import { wishListReducer } from './reducers/wishlist';
 
 // Configuration for redux-persist
 const persistConfig = {
@@ -18,6 +19,8 @@ const rootReducer = {
   user: persistReducer(persistConfig, userReducer),
   product: productReducer,
   cart: cartReducer,
+  wishlist: wishListReducer,
+
 
 };
 

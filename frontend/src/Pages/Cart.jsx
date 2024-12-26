@@ -3,7 +3,7 @@ import Navbar from '../Components/Layout/Header/Navbar'
 import "./Cart.scss";
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
-import { getCartByUserId } from '../Redux/actions/cart';
+import { getCartByUserId, updateCartItem } from '../Redux/actions/cart';
 import { useNavigate } from 'react-router-dom';
 
 function Cart() {
@@ -18,7 +18,7 @@ function Cart() {
 
     // Update cartList state only when cart is loaded and available
     const [cartList, setCartList] = useState(cart || []);
-    const handleCheckout = () =>{
+    const handleCheckout = () => {
         navigate("/checkout")
     }
     useEffect(() => {
@@ -27,7 +27,20 @@ function Cart() {
             dispatch(getCartByUserId(user._id));
         }
     }, [user, dispatch]); // Only run when user changes or is authenticated
+    const updateQuantity = (inventoryId, action) => {
 
+        const newQuantity = action === 'increase' ? 1 : -1;
+        const userId = user?._id;
+        console.log(userId);
+        const data = {
+            userId,
+            quantity: newQuantity
+        }
+        dispatch(updateCartItem(inventoryId, data)).then(() => {
+            dispatch(getCartByUserId(user._id));
+        })
+
+    };
     useEffect(() => {
         // Only update cartList when cart data is available
         if (cart?.items) {
@@ -36,13 +49,13 @@ function Cart() {
     }, [cart]); // Run only when cart is updated
 
     useEffect(() => {
-        if (cartList?.items && allProducts.length > 0) {
+        if (cartList?.items && allProducts?.length > 0) {
             const cartProducts = cartList.items.map((cartItem) => {
                 const product = allProducts.find((p) => p._id === cartItem.productId);
                 const inventory = product.inventory.find((i) => i._id === cartItem.inventoryId);
 
                 return {
-                    _id: product._id,
+                    _id: cartItem._id,
                     inventoryId: inventory._id,
                     size: inventory.size,
                     color: inventory.color,
@@ -69,9 +82,9 @@ function Cart() {
     }, [cartList, allProducts]); // Only run when cartList or allProducts change
 
     // Loading state if cart or product details are missing
-    if (!cart || !cart.items || productDetails.length === 0) {
-        return <div>Loading cart...</div>;
-    }
+    useEffect(() => {
+
+    }, [cart])
 
     return (
         cart && <>
@@ -98,6 +111,11 @@ function Cart() {
                                         <p>
                                             SIZE: {item?.size} / DESIGN: {item?.color}
                                         </p>
+                                    </div>
+                                    <div className="quantity-controls">
+                                        <button onClick={() => updateQuantity(item._id, 'decrease')}>-</button>
+                                        <span>{item.quantity}</span>
+                                        <button onClick={() => updateQuantity(item._id, 'increase')}>+</button>
                                     </div>
                                     <div className="price">
                                         {parseInt(item?.price).toLocaleString("vi-VN", {

@@ -334,6 +334,7 @@
 .cart-items {
   max-height: 300px;
   overflow-y: auto;
+  
 }
 
 .cart-item {
@@ -425,3 +426,21 @@
   color: white;
 }
 
+
+.cart-popup{
+  gap: 4px;
+  display: flex;
+  flex-direction: column;
+  color: #000;
+
+}
+.actions{
+  gap: 4px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.cart-popup> .actions > button,span{
+  color: #000;
+}

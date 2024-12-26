@@ -24,22 +24,20 @@ import { FaPinterest } from "react-icons/fa";
 import Badge from "@mui/material/Badge";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../../../Redux/actions/user";
-import { getCartByUserId } from "../../../Redux/actions/cart";
+import { getCartByUserId, updateCartItem } from "../../../Redux/actions/cart";
 import axios from "axios";
 import { server } from "../../../Config/server";
+import { formatCurrency } from "../../../utils/formatCurrency";
+import { toast } from "react-toastify";
+import { getWishListByUserId, updateWishListItem } from "../../../Redux/actions/wishlist";
 
 const Navbar = () => {
-  const [cartPopupOpen, setCartPopupOpen] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [productDetails, setProductDetails] = useState([]);
-  const [loadedProductIds, setLoadedProductIds] = useState(new Set()); // Track loaded products
-  const [total, setTotal] = useState(0);
+  const [cartPopupOpen, setCartPopupOpen] = useState(false);
+  const [wishListPopupOpen, setWishListPopupOpen] = useState(false);
+  const [productDetailsForWishlist, setProductDetailsForWishlist] = useState([]);
 
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const { user, isAuthenticated } = useSelector((state) => state.user);
-  const { cart } = useSelector((state) => state.cart);
-
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
     document.body.style.overflow = mobileMenuOpen ? "auto" : "hidden";
@@ -49,6 +47,9 @@ const Navbar = () => {
     setCartPopupOpen(!cartPopupOpen);
   };
 
+  const toggleWishlistPopup = () => {
+    setWishListPopupOpen(!wishListPopupOpen);
+  };
   const handleLogout = () => {
     dispatch(logoutUser());
     navigate("/loginSignUp");
@@ -59,72 +60,184 @@ const Navbar = () => {
       behavior: "smooth",
     });
   };
+  const { allProducts } = useSelector((state) => state.product);
+  const { user, isAuthenticated } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+  const { cart } = useSelector((state) => state.cart);
+  const { wishList } = useSelector((state) => state.wishlist);
 
+  const [totalPrice, setTotalPrice] = useState();
+  const navigate = useNavigate()
+
+  // Update cartList state only when cart is loaded and available
+  const [cartList, setCartList] = useState(cart || []);
+  const [wishlistItemList, setWishlistItemList] = useState(wishList || []);
+
+  const handleCheckout = () => {
+    navigate("/checkout")
+  }
   useEffect(() => {
     if (user) {
+      // Fetch cart data if user is logged in
       dispatch(getCartByUserId(user._id));
+      dispatch(getWishListByUserId(user._id));
+
     }
-    // const fetchProductDetails = async () => {
-    //   if (cart && cart[0] && cart[0].items) {
-    //     const items = cart.items.filter((item) => !loadedProductIds.has(item.productId));
+  }, [user, dispatch]); // Only run when user changes or is authenticated
+  const updateQuantity = (inventoryId, action) => {
 
-    //     if (items.length === 0) return; // Skip if all products are already loaded
+    const newQuantity = action === 'increase' ? 1 : -1;
+    const userId = user?._id;
+    console.log(userId);
+    const data = {
+      userId,
+      quantity: newQuantity
+    }
+    dispatch(updateCartItem(inventoryId, data)).then(() => {
+      dispatch(getCartByUserId(user._id));
+      toast.success("Cart Item Added Successfully");
 
-    //     try {
-    //       const promises = items.map((item) =>
-    //         axios.get(`${server}/product/get/${item.productId}`)
-    //       );
+    })
 
-    //       const responses = await Promise.all(promises);
-    //       const products = responses.map((response) => response.data);
+  };
 
-    //       setProductDetails(products);
+  const updateQuantityForWishList = (inventoryId, action) => {
 
-    //     } catch (error) {
-    //       console.error("Error fetching product details:", error);
-    //     }
-    //   }
-    // };
+    const newQuantity = action === 'increase' ? 1 : -1;
+    const userId = user?._id;
+    console.log(userId);
+    const data = {
+      userId,
+      quantity: newQuantity
+    }
+    dispatch(updateWishListItem(inventoryId, data)).then(() => {
+      dispatch(getWishListByUserId(user._id));
+      toast.success("Wishlist Item Added Successfully");
 
-    // fetchProductDetails();
-  }, [dispatch, user]);
+    })
 
+  };
 
-  useEffect(() => {
-    const fetchProductDetails = async () => {
-      if (!cart?.items) return; // Nếu cart hoặc cart.items không tồn tại, thoát khỏi hàm
+  // DELETE cart item function
+  const deleteCartItem = async (id) => {
+    try {
+      const response = await axios.delete(`${server}/cart/delete/${id}`, {
+        data: { userId: user._id } // Send userId in the request body
+      });
 
-      const items = cart.items; // Lấy danh sách items từ giỏ hàng
-      try {
-        // Gọi API cho từng productId
-        const promises = items.map((item) =>
-          axios.get(`http://localhost:4000/api/product/get/${item.productId}`)
-        );
+      if (response.status === 200) {
+        // Successfully deleted, update the cart
+        toast.success("Cart Item deleted Successfully");
 
-        const responses = await Promise.all(promises);
-        // console.log('all', responses);
-        // Kết quả là một mảng chứa thông tin sản phẩm
-        const products = responses.map((response) => response.data.product);
+        dispatch(getCartByUserId(user._id));
 
-        // Cập nhật danh sách sản phẩm
-        setProductDetails(products);
-      } catch (error) {
-        console.error("Error fetching product details:", error);
+      } else {
+        console.error("Error deleting cart item:", response.data.message);
+        // Handle error, e.g., show an error message to the user
       }
-    };
+    } catch (error) {
+      console.error("Error deleting cart item:", error);
+      // Handle error
+    }
+  };
 
-    fetchProductDetails();
-  }, [cart, dispatch]);
+  // DELETE cart item function
+  const deleteWishlistItem = async (id) => {
+    try {
+      const response = await axios.delete(`${server}/wishlist/delete/${id}`, {
+        data: { userId: user._id } // Send userId in the request body
+      });
+
+      if (response.status === 200) {
+        // Successfully deleted, update the cart
+        toast.success("wishlist Item deleted Successfully");
+
+        dispatch(getCartByUserId(user._id));
+
+      } else {
+        console.error("Error deleting wishlist item:", response.data.message);
+        // Handle error, e.g., show an error message to the user
+      }
+    } catch (error) {
+      console.error("Error deleting wishlist item:", error);
+      // Handle error
+    }
+  };
 
   useEffect(() => {
-    if (cart && cart.item && cart.items[0] && productDetails) {
-      setTotal(cart[0]?.totalPrice);
-    } else {
-      setTotal(0);
+    // Only update cartList when cart data is available
+    if (cart?.items) {
+      setCartList(cart);
     }
+    if (wishList?.items) {
+      setWishlistItemList(wishList);
+    }
+  }, [cart,wishList]); // Run only when cart is updated
+  console.log('wishList',wishList)
+  console.log('cartList',cartList)
 
-  }, [cart, productDetails]);
+  useEffect(() => {
+    if (cartList?.items && allProducts?.length > 0) {
+      const cartProducts = cartList.items.map((cartItem) => {
+        const product = allProducts.find((p) => p._id === cartItem.productId);
+        const inventory = product.inventory.find((i) => i._id === cartItem.inventoryId);
 
+        return {
+          _id: cartItem._id,
+          inventoryId: inventory._id,
+          size: inventory.size,
+          color: inventory.color,
+          price: inventory.price,
+          quantity: cartItem.quantity,
+          category_id: product.category_id,
+          product_name: product.product_name,
+          brand_id: product.brand_id,
+          description: product.description,
+          detail: product.detail,
+          main_image: product.main_image,
+          images: product.images,
+          hide: product.hide,
+          date_added: product.date_added,
+          date_updated: product.date_updated,
+        };
+      });
+      setProductDetails(cartProducts);
+      const totalPrice = productDetails.reduce((total, product) => {
+        return total + (product.price * product.quantity);
+      }, 0)
+      setTotalPrice(totalPrice);
+    }
+    if (wishlistItemList?.items && allProducts?.length > 0) {
+      const wishlistProducts = wishlistItemList.items.map((wishlistItem) => {
+        const product = allProducts.find((p) => p._id === wishlistItem.productId);
+        const inventory = product.inventory.find((i) => i._id === wishlistItem.inventoryId);
+
+        return {
+          _id: wishlistItem._id,
+          inventoryId: inventory._id,
+          size: inventory.size,
+          color: inventory.color,
+          price: inventory.price,
+          quantity: wishlistItem.quantity,
+          category_id: product.category_id,
+          product_name: product.product_name,
+          brand_id: product.brand_id,
+          description: product.description,
+          detail: product.detail,
+          main_image: product.main_image,
+          images: product.images,
+          hide: product.hide,
+          date_added: product.date_added,
+          date_updated: product.date_updated,
+        };
+      });
+      setProductDetailsForWishlist(wishlistProducts);
+     
+    }
+  }, [cartList, allProducts,wishlistItemList]); // Only run when cartList or allProducts change
+
+  // Loading state if cart or product details are missing
+  console.log('product', productDetailsForWishlist)
   return (
     productDetails && <>
 
@@ -192,7 +305,16 @@ const Navbar = () => {
               <RiShoppingBagLine size={22} />
             </Badge>
           </div>
-          <FiHeart size={22} onClick={scrollToTop} />
+
+          <div onClick={toggleWishlistPopup} style={{ position: "relative", cursor: "pointer" }}>
+            <Badge
+              // badgeContent={cart.items?.length || 0}
+              color="primary"
+              anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+            >
+              <FiHeart size={22} />
+            </Badge>
+          </div>
           {/* <RiMenu2Line size={22} /> */}
         </div>
       </nav>
@@ -214,10 +336,18 @@ const Navbar = () => {
                   </p>
                 </div>
                 <div className="item-actions">
-                  <span>${item?.price}</span>
-                  <button className="remove-btn" >
-                    &times;
-                  </button>
+                  <div className="cart-popup">
+                    <span>{formatCurrency(item?.price)}</span>
+                    <div className="actions">
+                      <button onClick={() => updateQuantity(item._id, 'decrease')}>-</button>
+                      <span>{item.quantity}</span>
+                      <button onClick={() => updateQuantity(item._id, 'increase')}>+</button>
+                    </div>
+
+                  </div>
+                  <div className="remove-btn" onClick={() => deleteCartItem(item._id)}> {/* Call deleteCartItem */}
+                    ×
+                  </div>
                 </div>
               </div>
             ))}
@@ -225,7 +355,7 @@ const Navbar = () => {
           <div className="cart-footer">
             <div className="total">
               <h3>Grand Total</h3>
-              <h3></h3>
+              <h3>{formatCurrency(totalPrice)}</h3>
             </div>
             <p className="sales-tax">sales tax</p>
 
@@ -236,6 +366,42 @@ const Navbar = () => {
             </button>
             <button className="checkout-btn">Proceed To Checkout</button>
           </div>
+        </div>
+      )}
+
+      {wishListPopupOpen && (
+        <div className="cartPopup">
+          <div className="cart-header">
+            <h2>Wishlist ({productDetailsForWishlist.length} items)</h2>
+            <button className="close-btn">&times;</button>
+          </div>
+          <div className="cart-items">
+            {productDetailsForWishlist.map((item) => (
+              <div className="cart-item" key={item?.id}>
+                <img src={item?.main_image} alt={item?.name} className="item-image" />
+                <div className="item-details">
+                  <h3>{item.product_name}</h3>
+                  <p>
+                    SIZE: {item?.size} / QTY: {item?.qty}
+                  </p>
+                </div>
+                <div className="item-actions">
+                  <div className="cart-popup">
+                    <div className="actions">
+                      <button onClick={() => updateQuantityForWishList(item._id, 'decrease')}>-</button>
+                      <span>{item.quantity}</span>
+                      <button onClick={() => updateQuantityForWishList(item._id, 'increase')}>+</button>
+                    </div>
+
+                  </div>
+                  <div className="remove-btn" onClick={() => deleteWishlistItem(item._id)}> {/* Call deleteCartItem */}
+                    ×
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+    
         </div>
       )}
       {/* Mobile Menu */}
