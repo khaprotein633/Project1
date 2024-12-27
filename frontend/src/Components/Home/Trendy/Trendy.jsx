@@ -5,8 +5,6 @@ import { Link } from "react-router-dom";
 import { FiHeart } from "react-icons/fi";
 import { FaStar, FaCartPlus } from "react-icons/fa";
 import toast from "react-hot-toast";
-import Navbar from "../../Layout/Header/Navbar";
-import  Footer  from "../../Layout/Footer/Footer";
 
 const Trendy = () => {
   const [activeTab, setActiveTab] = useState("tab1");
@@ -60,23 +58,10 @@ const Trendy = () => {
     }));
   };
 
-  const handleAddToCart = (product) => {
-    toast.success(`${product.product_name} added to cart!`, {
-      duration: 2000,
-      style: {
-        backgroundColor: "#07bc0c",
-        color: "white",
-      },
-      iconTheme: {
-        primary: "#fff",
-        secondary: "#07bc0c",
-      },
-    });
-  };
+ 
 
   return (
     <>
-    <Navbar/>
     <div className="trendyProducts">
       <h2>
         Our Trendy <span>Products</span>
@@ -121,26 +106,20 @@ const Trendy = () => {
                         className="trendyProduct_back"
                       />
                     </Link>
-                    <h4 onClick={() => handleAddToCart(product)}>
-                      Add to Cart
+                    <h4 onClick=''>
+                      Detail
                     </h4>
                   </div>
                   <div
                     className="trendyProductImagesCart"
-                    onClick={() => handleAddToCart(product)}
+                    onClick=''
                   >
                     <FaCartPlus />
                   </div>
                   <div className="trendyProductInfo">
                     <div className="trendyProductCategoryWishlist">
                       <p>Dresses</p>
-                      <FiHeart
-                        onClick={() => handleWishlistClick(product._id)}
-                        style={{
-                          color: wishList[product._id] ? "red" : "#767676",
-                          cursor: "pointer",
-                        }}
-                      />
+                     
                     </div>
                     <div className="trendyProductNameInfo">
                       <Link to={`/product/${product._id}`} onClick={scrollToTop}>
@@ -171,7 +150,7 @@ const Trendy = () => {
         </Link>
       </div>
     </div>
-    <Footer/>
+  
     </>
   );
 };

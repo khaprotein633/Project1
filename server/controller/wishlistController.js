@@ -35,8 +35,6 @@ const wishListController = {
             if (quantity < 1) {
                 return res.status(400).json({ message: 'Quantity must be at least 1' });
             }
-
-            // Tìm giỏ hàng của user
             let wishlist = await WishList.findOne({ userId });
 
             if (!wishlist) {
@@ -46,8 +44,6 @@ const wishListController = {
                     items: []
                 });
             }
-
-            // Kiểm tra sản phẩm đã tồn tại trong giỏ hàng chưa
             const existingItem = wishlist.items.find(
                 (item) =>
                     item.productId === productId &&

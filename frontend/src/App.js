@@ -10,7 +10,7 @@ import Home from "./Pages/Home.jsx";
 import Store from "./Redux/store.js";
 import Authentication from "./Pages/Authentication.jsx";
 import { getAllProducts } from "./Redux/actions/product.js";
-import Trendy from "./Components/Home/Trendy/Trendy.jsx";
+import Shop from "./Components/Home/Trendy/Shop.jsx";
 import ProfilePage from "./Pages/ProfilePage.jsx";
 import { useSelector } from "react-redux";
 import Cart from "./Pages/Cart.jsx";
@@ -54,7 +54,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Authentication />} />
-        <Route path="/shop" element={<Trendy />} />
+        <Route path="/shop" element={<Shop/>} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/product/:id" element={<ProductDetailPage />} />
 

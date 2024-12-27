@@ -24,7 +24,7 @@ import { FaPinterest } from "react-icons/fa";
 import Badge from "@mui/material/Badge";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../../../Redux/actions/user";
-import { getCartByUserId, updateCartItem } from "../../../Redux/actions/cart";
+import {  AddCart,getCartByUserId, updateCartItem } from "../../../Redux/actions/cart";
 import axios from "axios";
 import { server } from "../../../Config/server";
 import { formatCurrency } from "../../../utils/formatCurrency";
@@ -185,6 +185,7 @@ const Navbar = () => {
         return {
           _id: cartItem._id,
           inventoryId: inventory._id,
+          productId:product._id,
           size: inventory.size,
           color: inventory.color,
           price: inventory.price,
@@ -214,6 +215,7 @@ const Navbar = () => {
 
         return {
           _id: wishlistItem._id,
+          productId:product._id,
           inventoryId: inventory._id,
           size: inventory.size,
           color: inventory.color,
@@ -235,6 +237,30 @@ const Navbar = () => {
      
     }
   }, [cartList, allProducts,wishlistItemList]); // Only run when cartList or allProducts change
+
+  const handleAddToCart = (item) => {
+    // Kiểm tra nếu item không phải là undefined hoặc null
+    if (!item) {
+      toast.error("Invalid product");
+      return;
+    }
+    const cartItem = {
+      userId: user._id,
+      productId: item.productId,
+      quantity: 1, // Mặc định số lượng là 1
+      inventoryId: item.inventoryId,
+    };
+    console.log("wishlisstitem: ",cartItem)
+    try {
+      // Gọi action AddCart với dữ liệu sản phẩm cần thêm vào giỏ
+      dispatch(AddCart(cartItem));
+      //dispatch(getCartByUserId(user._id)); // Cập nhật lại giỏ hàng
+      toast.success("Added to cart successfully");
+    } catch (error) {
+      toast.error("Something went wrong!");
+      console.error(error);
+    }
+  };
 
   // Loading state if cart or product details are missing
   console.log('product', productDetailsForWishlist)
@@ -327,12 +353,15 @@ const Navbar = () => {
           </div>
           <div className="cart-items">
             {productDetails.map((item) => (
+             
               <div className="cart-item" key={item?.id}>
+                 <Link to={`/product/${item.productId}`} onClick={scrollToTop}>
                 <img src={item?.main_image} alt={item?.name} className="item-image" />
+                </Link>
                 <div className="item-details">
                   <h3>{item.product_name}</h3>
                   <p>
-                    SIZE: {item?.size} / QTY: {item?.qty}
+                    SIZE: {item?.size}  color: {item.colo}
                   </p>
                 </div>
                 <div className="item-actions">
@@ -343,7 +372,6 @@ const Navbar = () => {
                       <span>{item.quantity}</span>
                       <button onClick={() => updateQuantity(item._id, 'increase')}>+</button>
                     </div>
-
                   </div>
                   <div className="remove-btn" onClick={() => deleteCartItem(item._id)}> {/* Call deleteCartItem */}
                     ×
@@ -377,23 +405,32 @@ const Navbar = () => {
           </div>
           <div className="cart-items">
             {productDetailsForWishlist.map((item) => (
+              
               <div className="cart-item" key={item?.id}>
+                 <Link to={`/product/${item.productId}`} onClick={scrollToTop}>
                 <img src={item?.main_image} alt={item?.name} className="item-image" />
+                </Link>
                 <div className="item-details">
                   <h3>{item.product_name}</h3>
                   <p>
-                    SIZE: {item?.size} / QTY: {item?.qty}
+                    SIZE: {item?.size} / price: {parseInt(item.price).toLocaleString("vi-VN", {
+                style: "currency",
+                currency: "VND",
+              })}
                   </p>
                 </div>
                 <div className="item-actions">
                   <div className="cart-popup">
-                    <div className="actions">
+                    {/* <div className="actions">
                       <button onClick={() => updateQuantityForWishList(item._id, 'decrease')}>-</button>
                       <span>{item.quantity}</span>
                       <button onClick={() => updateQuantityForWishList(item._id, 'increase')}>+</button>
-                    </div>
+                    </div> */}
 
                   </div>
+                  <button onClick={()=>handleAddToCart(item)} className="add-to-cart-button">
+                      Add To Cart
+                  </button>
                   <div className="remove-btn" onClick={() => deleteWishlistItem(item._id)}> {/* Call deleteCartItem */}
                     ×
                   </div>
