@@ -8,8 +8,8 @@ import { FiHeart } from "react-icons/fi";
 import { getOneProductById } from "../../Redux/actions/product";
 import RecommendationAndReviews from "./RecommendationAndReview";
 import ReviewComponent from "./Review";
-import { AddCart ,getCartByUserId} from "../../Redux/actions/cart";
-import { AddWishList } from "../../Redux/actions/wishlist";
+import { AddCart, getCartByUserId } from "../../Redux/actions/cart";
+import { AddWishList, getWishListByUserId } from "../../Redux/actions/wishlist";
 import { toast } from "react-toastify";
 
 const ProductDetailPage = () => {
@@ -89,8 +89,12 @@ const ProductDetailPage = () => {
     };
 
     try {
-      dispatch(AddCart(cartItem));
-      dispatch(getCartByUserId(user._id))
+
+
+      dispatch(AddCart(cartItem)).then(() => {
+        dispatch(getCartByUserId(user._id));
+      })
+
       toast.success(`Added product ${product?.product_name} to cart successfully`);
     } catch {
       toast.error("Something went wrong!");
@@ -111,7 +115,11 @@ const ProductDetailPage = () => {
     };
 
     try {
-      dispatch(AddWishList(wishlistItem));
+      
+
+      dispatch(AddWishList(wishlistItem)).then(() => {
+        dispatch(getWishListByUserId(user._id));
+      })
       toast.success(`Added product ${product?.product_name} to Wishlist successfully`);
     } catch {
       toast.error("Something went wrong!");
