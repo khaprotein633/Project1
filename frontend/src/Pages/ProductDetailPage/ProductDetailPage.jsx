@@ -21,6 +21,7 @@ const ProductDetailPage = () => {
   const [colors, setColors] = useState([]);
   const [activeSection, setActiveSection] = useState(null);
   const [productImage, setProductImage] = useState(null);
+  const [productPrice, setProductPrice] = useState(null);  // New state for price
 
   // Redux selectors
   const { user } = useSelector((state) => state.user);
@@ -43,6 +44,7 @@ const ProductDetailPage = () => {
       setColors(uniqueColors);
       setFilteredInventory(product.inventory);
       setProductImage(product.main_image);
+      setProductPrice(product.inventory[0].price)
     }
   }, [product]);
 
@@ -73,6 +75,7 @@ const ProductDetailPage = () => {
 
     setFilteredInventory(filtered[0]);
     setProductImage(filtered[0]?.image_url || product.main_image);
+    setProductPrice(filtered[0]?.price || product?.inventory[0]?.price);
   };
 
   const handleAddToCart = () => {
@@ -140,7 +143,7 @@ const ProductDetailPage = () => {
           <div className="product-page__details">
             <h1 className="product-name">{product?.product_name}</h1>
             <p className="product-price">
-              {parseInt(product?.inventory[0]?.price).toLocaleString("vi-VN", {
+              {parseInt(productPrice).toLocaleString("vi-VN", {
                 style: "currency",
                 currency: "VND",
               })}

@@ -30,6 +30,7 @@ import { server } from "../../../Config/server";
 import { formatCurrency } from "../../../utils/formatCurrency";
 import { toast } from "react-toastify";
 import { getWishListByUserId, updateWishListItem } from "../../../Redux/actions/wishlist";
+import Search from "./Search";
 
 const Navbar = () => {
   const [productDetails, setProductDetails] = useState([]);
@@ -306,7 +307,8 @@ const Navbar = () => {
           </div>
         </div>
         <div className="iconContainer">
-          <FiSearch size={22} onClick={scrollToTop} />
+          <Search />
+          {/* <FiSearch size={22} onClick={scrollToTop} /> */}
           {user ? (
             <>
               <Link to="/profile">
