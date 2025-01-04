@@ -23,56 +23,60 @@ const LoginSignUp = () => {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    // Kiểm tra các trường đầu vào
     if (!email || !password) {
-      toast.error("Email and Password are required!");
-      return;  // Dừng lại nếu thiếu thông tin
+      toast.error("Vui lòng nhập email và mật khẩu!");
+      return; 
     }
     dispatch(loginUser({ email, password }));
   };
 
   const handleRegister = (e) => {
     e.preventDefault();
-    // Kiểm tra các trường đầu vào
+
     if (!name || !email || !password || !address || !phoneNumber) {
-      toast.error("All fields are required!");
-      return;  // Dừng lại nếu thiếu thông tin
+      toast.error("Vui lòng nhập đầy đủ thông tin!");
+      return;
     }
 
-    // Kiểm tra định dạng email
+    const usernameRegex = /^[a-zA-Z]+$/;
+
+    if (!usernameRegex.test(name)) {
+      toast.error("Tên tài khoản chỉ được chứa các chữ cái (không bao gồm số hoặc ký tự đặc biệt)");
+      return;
+    }
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      toast.error("Invalid email format!");
+      toast.error("Email Không hợp lệ!");
       return;
     }
 
-    // Kiểm tra mật khẩu (ít nhất 1 chữ cái viết hoa, 1 chữ cái viết thường, 1 số và 1 ký tự đặc biệt)
+
     const passwordRegex = /^[A-Za-z0-9]{6,}$/;
     if (!passwordRegex.test(password)) {
-      toast.error("Password must be at least 6 characters long and contain only letters and numbers.");
+      toast.error("Mật khẩu phải có 6 ký tự gồm chữ và số");
       return;
     }
 
-    // Kiểm tra định dạng số điện thoại (ví dụ: 10 chữ số)
-    const phoneRegex = /^[0-9]{10}$/;
+
+    const phoneRegex = /^(0(3[2-9]|5[2-9]|7[0|6-9]|8[1-9]|9[0-9]))\d{7}$/;
     if (!phoneRegex.test(phoneNumber)) {
-      toast.error("Invalid phone number format! Please enter a 10-digit number.");
+      toast.error("Số điện thoại không hợp lệ");
       return;
     }
 
-    // Gửi yêu cầu đăng ký
     dispatch(registerUser({ name, email, password, address, phoneNumber }));
   };
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate("/");  // Chuyển hướng đến trang chủ sau khi đăng nhập thành công
+      navigate("/");
     }
     if (error) {
-      toast.error(error);  // Hiển thị thông báo lỗi khi có lỗi từ API
+      toast.error(error);
     }
     if (success) {
-      toast.success("Registration successful! Please login.");
+      toast.success("Đăng ký thành công, vui lòng đăng nhập.");
     }
   }, [isAuthenticated, success, error, navigate]);
 

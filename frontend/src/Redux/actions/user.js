@@ -70,7 +70,7 @@ export const registerUser = (dataUser) => async (dispatch) => {
       payload: data.success,
     });
 
-    toast.success(`Account registered successfully!`);
+    toast.success(`Đăng ký thành công!`);
   } catch (error) {
     console.log(error);
 

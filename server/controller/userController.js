@@ -21,13 +21,11 @@ const userController = {
     
     getUserByEmailorPhonenumber: async (req, res) => {
         try {
-            const searchTerm = req.query.search || ''; // Lấy từ khóa tìm kiếm từ query
-    
-            // Sử dụng $or để tìm theo email hoặc số điện thoại
+            const searchTerm = req.query.search || ''; 
             const query = {
                 $or: [
-                    { email: { $regex: searchTerm, $options: 'i' } }, // Tìm theo email
-                    { phonenumber: { $regex: searchTerm, $options: 'i' } } // Tìm theo số điện thoại
+                    { email: { $regex: searchTerm, $options: 'i' } }, 
+                    { phonenumber: { $regex: searchTerm, $options: 'i' } } 
                 ]
             };
     
@@ -62,14 +60,11 @@ const userController = {
     addUser: async (req, res) => {
         try {
             const { email, phoneNumber } = req.body;
-    
-            // Kiểm tra nếu email đã tồn tại
             const existingEmail = await User.findOne({ email });
             if (existingEmail) {
                 return res.status(400).json({ message: 'Email đã tồn tại' });
             }
     
-            // Kiểm tra nếu số điện thoại đã tồn tại
             if (phoneNumber) {
                 const existingPhone = await User.findOne({ phoneNumber });
                 if (existingPhone) {
@@ -77,7 +72,6 @@ const userController = {
                 }
             }
     
-            // Tạo người dùng mới
             const newUser = new User(req.body);
             await newUser.save();
             res.status(201).json(newUser);
@@ -90,7 +84,6 @@ const userController = {
 
     updateUser: async (req, res) => {
         try {
-            // Kiểm tra nếu email hoặc số điện thoại có thay đổi và đã tồn tại
             if (req.body.email) {
                 const existingEmail = await User.findOne({ email: req.body.email });
                 if (existingEmail && existingEmail._id.toString() !== req.params._id) {
@@ -104,8 +97,6 @@ const userController = {
                     return res.status(400).json({ message: 'Số điện thoại đã tồn tại' });
                 }
             }
-    
-            // Cập nhật người dùng
             const user = await User.findOneAndUpdate(
                 { _id: req.params._id },
                 req.body,
@@ -141,11 +132,11 @@ const userController = {
         try {
             const user = await User.findOne({ email: req.body.email });
             if (!user) {
-                return res.status(404).json({ message: 'User not found' });
+                return res.status(404).json({ message: 'Email sai' });
             }
 
             if (user.password !== req.body.password) {
-                return res.status(401).json({ message: 'Password is not matching' });
+                return res.status(401).json({ message: 'Mật khẩu sai' });
             }
 
             // const { password, ...userWithoutPassword } = user.toObject();
