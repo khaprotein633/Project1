@@ -17,7 +17,7 @@ const UpdateUser = ({ edituser, onSuccess }) => {
                 email: edituser.email,
                 password: edituser.password,
                 address: edituser.address,
-                phonenumber: edituser.phonenumber, // Sửa lại từ edituser.address thành edituser.phonenumber
+                phoneNumber: edituser.phoneNumber, // Sửa lại từ edituser.address thành edituser.phonenumber
                 role_id: edituser.role_id,
             });
         }
@@ -103,7 +103,7 @@ const UpdateUser = ({ edituser, onSuccess }) => {
 
                 <Form.Item
                     label="Số điện thoại"
-                    name="phonenumber"
+                    name="phoneNumber"
                     rules={[{ required: true, message: 'Vui lòng nhập số điện thoại!' }]}
                 >
                     <Input />

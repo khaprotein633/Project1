@@ -108,7 +108,7 @@ const productController = {
         }
     },
     updateProduct: async (req, res) => {
-        const productId = req.params._id; 
+        const productId = req.params.product_id; 
         const { removeImages } = req.body;
         const parsedRemoveImages = removeImages ? JSON.parse(removeImages) : []; 
     
@@ -153,11 +153,11 @@ const productController = {
 
     deleteProduct: async (req, res) => {
         try {
-            const product = await Product.findOneAndDelete({ _id: req.params._id });
+            const product = await Product.findOneAndDelete({ _id: req.params.product_id });
             if (!product) {
                 return res.status(404).json({ message: 'Product not found' });
             }
-            res.status(204).send();
+            res.status(204).json({ message: 'Product deleted successfully' });
         } catch (error) {
             console.error('Error deleting product:', error);
             res.status(500).json({ message: 'Internal Server Error' });
@@ -233,6 +233,11 @@ const productController = {
             if (!product) {
                 return res.status(404).json({ message: 'Product not found' });
             } 
+             
+        const existingInventory = product.inventory.find(inventory => inventory.size === size && inventory.color === color);
+        if (existingInventory) {
+            return res.status(400).json({ message: `Đã có màu sắc ${color} và kích ${size} trong tồn kho`});
+        }
             const newInventory = { size, color, price, quantity, image_url };
             product.inventory.push(newInventory);
             await product.save();

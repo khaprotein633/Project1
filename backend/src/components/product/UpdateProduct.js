@@ -34,6 +34,7 @@ const UpdateProduct = ({ editproduct, onSuccess }) => {
                 brand_id: editproduct.brand_id,
                 detail: editproduct.detail,
                 description: editproduct.description,
+                hide: editproduct.hide,
                 main_image: editproduct.main_image ? [{
                     uid: '-1', name: 'main_image', status: 'done', url: editproduct.main_image
                 }] : [],
@@ -53,7 +54,7 @@ const UpdateProduct = ({ editproduct, onSuccess }) => {
             toast.error('Lỗi khi lấy danh sách loại sản phẩm!');
         }
     };
- 
+
     const fetchBrands = async () => {
         try {
             const res = await axios.get('http://localhost:4000/api/brand/getall');
@@ -66,14 +67,14 @@ const UpdateProduct = ({ editproduct, onSuccess }) => {
 
     const handleRemoveImage = async (file) => {
         const imageUrl = file.url || file.preview;
-    
+
         setRemoveImages((prev) => {
             const updatedList = [...prev, imageUrl];
-            console.log("Updated removeImages list:", updatedList);  
+            console.log("Updated removeImages list:", updatedList);
             return updatedList;
         });
     };
-    
+
     useEffect(() => {
         console.log("Current removeImages:", removeImages);
     }, [removeImages]);
@@ -82,15 +83,16 @@ const UpdateProduct = ({ editproduct, onSuccess }) => {
         setLoading(true);
 
         try {
-            
+
             const formData = new FormData();
             formData.append('product_name', values.product_name);
             formData.append('description', values.description);
             formData.append('detail', values.detail);
             formData.append('category_id', values.category_id);
             formData.append('brand_id', values.brand_id);
-            formData.append('removeImages', JSON.stringify(removeImages)); 
-            console.log( "aaaa:",formData.removeImages);
+            formData.append('hide', values.hide);
+            formData.append('removeImages', JSON.stringify(removeImages));
+            console.log("aaaa:", formData.removeImages);
             if (values.main_image && values.main_image[0]?.originFileObj) {
                 formData.append('main_image', values.main_image[0].originFileObj);
             }
@@ -210,6 +212,21 @@ const UpdateProduct = ({ editproduct, onSuccess }) => {
                     <Upload name="auxiliary_images" listType="picture-card" maxCount={10} onPreview={handlePreview} onRemove={handleRemoveImage} multiple beforeUpload={() => false}>
                         <Button icon={<UploadOutlined />}>Tải ảnh lên</Button>
                     </Upload>
+                </Form.Item>
+                <Form.Item
+                    label="Ẩn sản phẩm"
+                    name="hide"  
+                >
+                    <Select   rules={[{ required: true, message: 'Chọn ẩn hiện' }]}>
+                    
+                            <Select.Option key={true} value={true}>
+                                Ẩn sản phẩm
+                            </Select.Option>
+                            <Select.Option key={false} value={false}>
+                                Hiện sản phẩm 
+                            </Select.Option>
+                       
+                    </Select>
                 </Form.Item>
 
                 <Form.Item wrapperCol={{ offset: 8, span: 16 }}>

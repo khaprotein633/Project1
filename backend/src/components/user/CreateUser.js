@@ -32,7 +32,7 @@ const CreateUser = ({ onSuccess }) => {
                 email: values.email,
                 password: values.password,
                 address: values.address,
-                phonenumber: values.phonenumber,
+                phoneNumber: values.phonenumber,
                 role_id: values.role_id,
             });
 

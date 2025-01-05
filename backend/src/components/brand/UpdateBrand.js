@@ -89,10 +89,11 @@ const UpdateBrand = ({ brandId, onSuccess }) => {
 
             form.resetFields();
             setFileList([]);
+            toast.success('Cập nhật thương hiệu thành công!');
             if (onSuccess) {
                 onSuccess();
             }
-            toast.success('Cập nhật thương hiệu thành công!');
+           
         } catch (err) {
             console.error(err);
             toast.error(err?.response?.data?.message || 'Có lỗi xảy ra!');
@@ -119,16 +120,18 @@ const UpdateBrand = ({ brandId, onSuccess }) => {
                     <Input />
                 </Form.Item>
 
-                <Form.Item label="Logo thương hiệu">
+                <Form.Item label="Logo thương hiệu"
+               >
                     <Upload
                         name="brand_logo"
                         listType="picture-card"
                         fileList={fileList}
-                        maxCount={1} // Chỉ cho phép một hình ảnh
+                        maxCount={1} 
                         onPreview={handlePreview}
                         onChange={handleLogoChange}
-                        beforeUpload={() => false} // Không upload tự động
-                        onRemove={() => setFileList([])} // Xóa hình ảnh
+                        beforeUpload={() => false}
+                        onRemove={() => setFileList([])}
+                        rules={[{ required: true, message: 'Vui lòng chọn logo!' }]} 
                     >
                         {fileList.length < 1 && (
                             <Button icon={<UploadOutlined />}>Tải logo lên</Button>

@@ -39,7 +39,7 @@ const UserInfo = ({ userid }) => {
                         <strong>Địa chỉ:</strong> {user.address || 'N/A'}
                     </div>
                     <div>
-                        <strong>Số điện thoại:</strong> {user.phonenumber || 'N/A'}
+                        <strong>Số điện thoại:</strong> {user.phoneNumber || 'N/A'}
                     </div>
                 </div>
             ) : (

@@ -19,6 +19,7 @@ const productSchema = new mongoose.Schema({
   main_image: { type: String },
   images: [{type:String}],
   inventory: [inventorySchema] ,
+  hide: { type: Boolean, default: false},
   date_added: { type: Date, default: Date.now },
   date_updated: { type: Date, default: Date.now },
 }, { versionKey: false });
